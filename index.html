@@ -37,20 +37,43 @@
 
   <style>
     /* ==========================================================================
-       RISOGRAPH PRINT ENGINE & TEXTURES
+       RISOGRAPH PRINT ENGINE, FLUID TYPOGRAPHY & MOTION SYSTEM
        ========================================================================== */
     :root {
       --paper: #F7F4EB;
+      --paper-dark: #EFECE1;
       --riso-red: #FF2E4C;
       --riso-blue: #0047AB;
       --riso-ink: #141B29;
+      --plate-x: 4px;
+      --plate-y: 3px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      overflow-x: clip;
     }
 
     body {
       background-color: var(--paper);
       color: var(--riso-ink);
-      overflow-x: hidden;
+      overflow-x: clip;
       position: relative;
+      min-width: 320px;
+    }
+
+    /* Fluid Responsive Typography via clamp() */
+    .fluid-hero-title {
+      font-size: clamp(2.35rem, 6.2vw + 0.75rem, 4.75rem);
+      line-height: 1.02;
+    }
+    .fluid-section-title {
+      font-size: clamp(1.95rem, 4vw + 0.65rem, 3.35rem);
+      line-height: 1.08;
+    }
+    .fluid-card-title {
+      font-size: clamp(1.4rem, 2.1vw + 0.5rem, 1.95rem);
+      line-height: 1.18;
     }
 
     /* Subtle Paper Grain Overlay across Viewport */
@@ -60,9 +83,47 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 9999;
+      z-index: 9998;
       opacity: 0.045;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Press-Proof Calibration Bar & Scroll Progress Ink Meter */
+    #press-preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background-color: var(--paper);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.45s ease;
+    }
+    #press-preloader.loaded {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    @keyframes plateCalibrate {
+      0% { transform: translate(-14px, 10px) rotate(-4deg); }
+      55% { transform: translate(6px, -4px) rotate(2deg); }
+      100% { transform: translate(4px, 3px) rotate(0deg); }
+    }
+    .calibrate-plate {
+      animation: plateCalibrate 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    #scroll-ink-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--riso-blue) 0%, var(--riso-red) 100%);
+      z-index: 9999;
+      transition: width 0.08s linear;
+      box-shadow: 0 2px 0 rgba(0, 71, 171, 0.25);
     }
 
     /* Halftone Dot Patterns */
@@ -89,34 +150,49 @@
       background-color: var(--paper);
       border: 2px solid var(--riso-blue);
       box-shadow: 6px 6px 0px var(--riso-red);
-      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.24s ease;
     }
     .riso-card:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 9px 9px 0px var(--riso-red);
+      transform: translate(-3px, -3px);
+      box-shadow: 10px 10px 0px var(--riso-red);
     }
 
     .riso-card-blue-shadow {
       background-color: var(--paper);
       border: 2px solid var(--riso-red);
       box-shadow: 6px 6px 0px var(--riso-blue);
-      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.24s ease;
     }
     .riso-card-blue-shadow:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 9px 9px 0px var(--riso-blue);
+      transform: translate(-3px, -3px);
+      box-shadow: 10px 10px 0px var(--riso-blue);
     }
 
-    /* Tactile Print Buttons */
+    /* Ink Bleed Hover Wash inside Pillar Cards */
+    .ink-bleed-wash {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+      transform: scale(0.96);
+      pointer-events: none;
+    }
+    .group:hover .ink-bleed-wash {
+      opacity: 0.06;
+      transform: scale(1);
+    }
+
+    /* Tactile Print Buttons (Touch-Friendly >= 44px height) */
     .btn-riso-red {
+      min-height: 44px;
       background-color: var(--riso-red);
       color: var(--paper);
       border: 2px solid var(--riso-blue);
       box-shadow: 4px 4px 0px var(--riso-blue);
-      transition: all 0.15s ease;
+      transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.16s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .btn-riso-red:hover {
-      transform: translate(-1.5px, -1.5px);
+      transform: translate(-2px, -2px);
       box-shadow: 6px 6px 0px var(--riso-blue);
     }
     .btn-riso-red:active {
@@ -125,14 +201,15 @@
     }
 
     .btn-riso-blue {
+      min-height: 44px;
       background-color: var(--riso-blue);
       color: var(--paper);
       border: 2px solid var(--riso-red);
       box-shadow: 4px 4px 0px var(--riso-red);
-      transition: all 0.15s ease;
+      transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.16s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .btn-riso-blue:hover {
-      transform: translate(-1.5px, -1.5px);
+      transform: translate(-2px, -2px);
       box-shadow: 6px 6px 0px var(--riso-red);
     }
     .btn-riso-blue:active {
@@ -141,15 +218,16 @@
     }
 
     .btn-riso-outline {
+      min-height: 44px;
       background-color: var(--paper);
       color: var(--riso-blue);
       border: 2px solid var(--riso-blue);
       box-shadow: 4px 4px 0px var(--riso-red);
-      transition: all 0.15s ease;
+      transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.16s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.16s ease;
     }
     .btn-riso-outline:hover {
-      background-color: #EFECE1;
-      transform: translate(-1.5px, -1.5px);
+      background-color: var(--paper-dark);
+      transform: translate(-2px, -2px);
       box-shadow: 6px 6px 0px var(--riso-red);
     }
     .btn-riso-outline:active {
@@ -173,29 +251,108 @@
       opacity: 0.85;
     }
 
-    /* Misregistered Headline Effect */
+    /* Dynamic Misregistered Headline Effect linked to Registration Proofing */
     .riso-headline-stack {
       position: relative;
       display: inline-block;
     }
     .riso-headline-shadow {
       position: absolute;
-      top: 3px;
-      left: 4px;
+      top: 0;
+      left: 0;
+      transform: translate(var(--plate-x), var(--plate-y));
       color: var(--riso-red);
       mix-blend-mode: multiply;
       user-select: none;
       pointer-events: none;
       z-index: 0;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Hero Interactive Proofing Plates */
+    .proof-plate-red {
+      transform: translate(var(--plate-x), var(--plate-y));
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .proof-plate-blue {
+      transform: translate(calc(var(--plate-x) * -0.5), calc(var(--plate-y) * -0.5));
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Scroll-Triggered Ink Registration Reveal System */
+    .riso-reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+    .riso-reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Dual Plate Alignment Animation on Scroll */
+    .riso-plate-align {
+      transform: translate(12px, 12px);
+      transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .is-visible .riso-plate-align {
+      transform: translate(0px, 0px);
+    }
+
+    /* Infinite Marquee Ticker Tape */
+    @keyframes risoMarquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: risoMarquee 32s linear infinite;
+    }
+    .marquee-wrapper:hover .marquee-track,
+    .marquee-wrapper:focus-within .marquee-track {
+      animation-play-state: paused;
     }
 
     /* Custom Radio/Pill Toggle for Pulse Check */
+    .pulse-option {
+      min-height: 44px;
+    }
     .pulse-option.active {
       background-color: var(--riso-blue);
       color: var(--paper);
       border-color: var(--riso-red);
       box-shadow: 3px 3px 0px var(--riso-red);
       transform: translate(-1px, -1px);
+    }
+
+    /* Ink Stamp Pop-In Animation */
+    @keyframes stampSlam {
+      0% { opacity: 0; transform: scale(1.22) rotate(-3deg); }
+      65% { opacity: 1; transform: scale(0.97) rotate(0.8deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+    .stamp-animate {
+      animation: stampSlam 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Modal Scale/Stamp Entrance */
+    @keyframes modalStamp {
+      0% { opacity: 0; transform: scale(0.92) translateY(14px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-panel-enter {
+      animation: modalStamp 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Myth vs. Fact Interactive Flip/Toggle Cards */
+    .myth-fact-card {
+      cursor: pointer;
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease;
+    }
+    .myth-fact-card:hover {
+      transform: translateY(-3px);
     }
 
     /* Slow rotation for Risograph Stamp */
@@ -206,9 +363,36 @@
     .animate-spin-slow {
       animation: spinSlow 28s linear infinite;
     }
+
+    /* Respect Reduced Motion Preferences */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .riso-reveal { opacity: 1; transform: none; }
+    }
   </style>
 </head>
 <body class="font-sans antialiased selection:bg-risoRed selection:text-paper">
+  <!-- Press-Proof Calibration Preloader -->
+  <div id="press-preloader" aria-hidden="true">
+    <div class="relative w-20 h-20 mb-4 flex items-center justify-center">
+      <div class="absolute inset-0 rounded-full border-4 border-risoRed bg-risoRed/20 riso-multiply calibrate-plate"></div>
+      <div class="relative w-full h-full rounded-full border-4 border-risoBlue bg-paper flex items-center justify-center">
+        <span class="font-display font-black text-xl text-risoBlue">B<span class="text-risoRed">&amp;</span>W</span>
+      </div>
+    </div>
+    <div class="font-mono text-xs font-bold uppercase tracking-[0.22em] text-risoBlue">
+      CALIBRATING INK PLATES...
+    </div>
+  </div>
+
+  <!-- Top Viewport Scroll-Progress Ink Meter -->
+  <div id="scroll-ink-bar" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+
   <!-- Tactile Risograph Paper Grain Overlay -->
   <div class="paper-grain" aria-hidden="true"></div>
 
@@ -230,16 +414,16 @@
 
   <!-- Sticky Editorial Header -->
   <header class="sticky top-0 z-40 bg-paper/95 backdrop-blur-sm reg-line">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-2">
       <!-- Brand Logo / Risograph Registration Mark -->
-      <a href="index.html" class="flex items-center gap-3 group focus:outline-none">
-        <div class="relative w-11 h-11 flex items-center justify-center">
+      <a href="index.html" class="flex items-center gap-2.5 sm:gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-risoRed rounded-lg">
+        <div class="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center shrink-0">
           <!-- Misregistered Red Circle -->
           <div class="absolute inset-0 rounded-full border-2 border-risoRed bg-risoRed/20 translate-x-1 translate-y-1 riso-multiply transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
           <!-- Primary Blue Circle -->
           <div class="relative w-full h-full rounded-full border-2 border-risoBlue bg-paper flex items-center justify-center">
             <!-- Registration Crosshair -->
-            <svg class="w-6 h-6 text-risoBlue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-risoBlue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <circle cx="12" cy="12" r="7" />
               <line x1="12" y1="2" x2="12" y2="22" />
               <line x1="2" y1="12" x2="22" y2="12" />
@@ -247,33 +431,33 @@
           </div>
         </div>
         <div>
-          <span class="font-display font-black text-2xl tracking-tight text-risoBlue block leading-none">
+          <span class="font-display font-black text-xl sm:text-2xl tracking-tight text-risoBlue block leading-none">
             BOLD <span class="text-risoRed">&amp;</span> WELL
           </span>
-          <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-risoBlue/80 block mt-0.5">
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.18em] uppercase text-risoBlue/80 block mt-0.5">
             Men's Health Press
           </span>
         </div>
       </a>
 
       <!-- Desktop Navigation (4 Core Site Pages) -->
-      <nav aria-label="Main Navigation" class="hidden md:flex items-center gap-7">
-        <a href="index.html" aria-current="page" class="font-mono text-sm font-bold uppercase tracking-wider text-risoRed border-b-2 border-risoRed pb-1">
+      <nav aria-label="Main Navigation" class="hidden md:flex items-center gap-6 lg:gap-8">
+        <a href="index.html" aria-current="page" class="font-mono text-sm font-bold uppercase tracking-wider text-risoRed border-b-2 border-risoRed py-2">
           01. Home
         </a>
-        <a href="about.html" class="font-mono text-sm font-medium uppercase tracking-wider text-risoBlue hover:text-risoRed transition-colors pb-1">
+        <a href="about.html" class="font-mono text-sm font-medium uppercase tracking-wider text-risoBlue hover:text-risoRed transition-colors py-2">
           02. About Us
         </a>
-        <a href="resources.html" class="font-mono text-sm font-medium uppercase tracking-wider text-risoBlue hover:text-risoRed transition-colors pb-1">
+        <a href="resources.html" class="font-mono text-sm font-medium uppercase tracking-wider text-risoBlue hover:text-risoRed transition-colors py-2">
           03. Resources
         </a>
-        <a href="contact.html" class="font-mono text-sm font-medium uppercase tracking-wider text-risoBlue hover:text-risoRed transition-colors pb-1">
+        <a href="contact.html" class="font-mono text-sm font-medium uppercase tracking-wider text-risoBlue hover:text-risoRed transition-colors py-2">
           04. Contact Us
         </a>
       </nav>
 
       <!-- Desktop Primary CTA & Mobile Menu Button -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2.5 sm:gap-3">
         <a href="#pulse-check" class="hidden sm:inline-flex items-center gap-2 btn-riso-red font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-lg">
           <span>2-Min Check-In</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -281,8 +465,8 @@
           </svg>
         </a>
 
-        <!-- Mobile Hamburger Button -->
-        <button id="mobile-menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden p-2.5 rounded-lg border-2 border-risoBlue text-risoBlue hover:bg-risoBlue hover:text-paper transition-colors">
+        <!-- Mobile Hamburger Button (44x44px touch target) -->
+        <button id="mobile-menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden min-w-[44px] min-h-[44px] p-2.5 rounded-lg border-2 border-risoBlue text-risoBlue hover:bg-risoBlue hover:text-paper transition-colors flex items-center justify-center">
           <span class="sr-only">Open main menu</span>
           <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -294,22 +478,23 @@
       </div>
     </div>
 
-    <!-- Mobile Dropdown Navigation -->
-    <div id="mobile-menu" class="hidden md:hidden bg-paper border-t-2 border-risoBlue px-4 pt-4 pb-6 space-y-3 shadow-xl">
-      <a href="index.html" class="block px-3 py-2.5 rounded-lg bg-risoRed/10 border-2 border-risoRed font-mono text-sm font-bold uppercase text-risoRed">
-        01. Home (Current)
+    <!-- Accessible Slide-Down Mobile Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden bg-paper border-t-2 border-risoBlue px-4 pt-4 pb-6 space-y-2.5 shadow-2xl">
+      <a href="index.html" aria-current="page" class="flex items-center justify-between min-h-[46px] px-4 py-2.5 rounded-xl bg-risoRed/10 border-2 border-risoRed font-mono text-sm font-bold uppercase text-risoRed">
+        <span>01. Home</span>
+        <span class="text-[10px] bg-risoRed text-paper px-2 py-0.5 rounded">ACTIVE</span>
       </a>
-      <a href="about.html" class="block px-3 py-2.5 rounded-lg border-2 border-transparent hover:border-risoBlue font-mono text-sm font-bold uppercase text-risoBlue">
+      <a href="about.html" class="flex items-center min-h-[46px] px-4 py-2.5 rounded-xl border-2 border-transparent hover:border-risoBlue font-mono text-sm font-bold uppercase text-risoBlue">
         02. About Us
       </a>
-      <a href="resources.html" class="block px-3 py-2.5 rounded-lg border-2 border-transparent hover:border-risoBlue font-mono text-sm font-bold uppercase text-risoBlue">
+      <a href="resources.html" class="flex items-center min-h-[46px] px-4 py-2.5 rounded-xl border-2 border-transparent hover:border-risoBlue font-mono text-sm font-bold uppercase text-risoBlue">
         03. Resources &amp; Guides
       </a>
-      <a href="contact.html" class="block px-3 py-2.5 rounded-lg border-2 border-transparent hover:border-risoBlue font-mono text-sm font-bold uppercase text-risoBlue">
+      <a href="contact.html" class="flex items-center min-h-[46px] px-4 py-2.5 rounded-xl border-2 border-transparent hover:border-risoBlue font-mono text-sm font-bold uppercase text-risoBlue">
         04. Contact Us
       </a>
       <div class="pt-2">
-        <a href="#pulse-check" class="w-full flex justify-center items-center gap-2 btn-riso-red font-mono text-xs font-bold uppercase tracking-wider px-4 py-3 rounded-lg">
+        <a href="#pulse-check" class="w-full flex justify-center items-center gap-2 btn-riso-red font-mono text-xs font-bold uppercase tracking-wider px-4 py-3.5 rounded-xl">
           Start 2-Min Health Check-In
         </a>
       </div>
@@ -318,28 +503,28 @@
 
   <main>
     <!-- ========================================================================
-         1. HERO SECTION — ASYMMETRIC EDITORIAL PRINT LAYOUT
+         1. HERO SECTION — INTERACTIVE REGISTRATION PROOFING STAGE
          ======================================================================== -->
-    <section class="relative overflow-hidden border-b-2 border-risoBlue pt-10 pb-16 lg:pt-16 lg:pb-24">
+    <section id="hero-stage" class="relative overflow-hidden border-b-2 border-risoBlue pt-8 pb-14 sm:pt-12 sm:pb-20 lg:pt-16 lg:pb-24">
       <!-- Subtle Halftone Corner Texture -->
       <div class="absolute top-0 right-0 w-72 h-72 halftone-blue opacity-20 pointer-events-none"></div>
       <div class="absolute bottom-0 left-0 w-64 h-64 halftone-red opacity-15 pointer-events-none"></div>
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-10 items-center">
           
           <!-- Left Column: Editorial Copy & Dual CTAs (7 Cols) -->
-          <div class="lg:col-span-7 space-y-6">
+          <div class="lg:col-span-7 space-y-6 riso-reveal is-visible">
             <!-- Print Tagline Badge -->
             <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border-2 border-risoBlue bg-paper shadow-[3px_3px_0px_#FF2E4C]">
               <span class="w-2.5 h-2.5 rounded-full bg-risoRed"></span>
-              <span class="font-mono text-xs font-bold uppercase tracking-widest text-risoBlue">
+              <span class="font-mono text-[11px] sm:text-xs font-bold uppercase tracking-widest text-risoBlue">
                 Mind &bull; Body &bull; Sexual Vitality
               </span>
             </div>
 
-            <!-- Risograph Misregistered Headline -->
-            <h1 class="font-display font-black text-4xl sm:text-6xl lg:text-[4.25rem] leading-[1.03] tracking-tight text-risoBlue">
+            <!-- Risograph Misregistered Fluid Headline -->
+            <h1 class="font-display font-black fluid-hero-title tracking-tight text-risoBlue">
               <span class="riso-headline-stack">
                 <span class="riso-headline-shadow" aria-hidden="true">Unfiltered Health</span>
                 <span class="relative z-10">Unfiltered Health</span>
@@ -349,60 +534,67 @@
             </h1>
 
             <!-- Grounded, Destigmatizing Subheadline -->
-            <p class="text-lg sm:text-xl text-risoInk/90 max-w-2xl leading-relaxed font-normal">
+            <p class="text-base sm:text-xl text-risoInk/90 max-w-2xl leading-relaxed font-normal">
               Real talk and clinical clarity on mental resilience, sexual performance, and preventive care. No locker-room myths, no silent suffering—just honest tools built for the life you actually live.
             </p>
 
             <!-- Dual Print-Style CTAs -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
-              <a href="#pillars" class="btn-riso-red px-6 py-4 rounded-xl font-mono text-sm font-bold uppercase tracking-wider text-center flex items-center justify-center gap-2.5">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 pt-2">
+              <a href="#pillars" class="btn-riso-red px-6 py-3.5 rounded-xl font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-center flex items-center justify-center gap-2.5">
                 <span>Explore Core Pillars</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
               </a>
-              <a href="#pulse-check" class="btn-riso-outline px-6 py-4 rounded-xl font-mono text-sm font-bold uppercase tracking-wider text-center flex items-center justify-center gap-2.5">
+              <a href="#pulse-check" class="btn-riso-outline px-6 py-3.5 rounded-xl font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-center flex items-center justify-center gap-2.5">
                 <span class="w-2.5 h-2.5 rounded-full bg-risoRed"></span>
                 <span>Take the 2-Min Check-In</span>
               </a>
             </div>
 
             <!-- Quick Editorial Stats Strip -->
-            <div class="grid grid-cols-3 gap-4 pt-6 border-t-2 border-dashed border-risoBlue/40 max-w-xl">
+            <div class="grid grid-cols-3 gap-3 sm:gap-4 pt-6 border-t-2 border-dashed border-risoBlue/40 max-w-xl">
               <div>
-                <div class="font-display font-black text-2xl sm:text-3xl text-risoRed">1 in 3</div>
-                <div class="font-mono text-[11px] uppercase tracking-wider text-risoBlue mt-0.5">Men skip annual checkups</div>
+                <div class="font-display font-black text-xl sm:text-3xl text-risoRed">1 in 3</div>
+                <div class="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-risoBlue mt-0.5">Men skip annual checkups</div>
               </div>
               <div>
-                <div class="font-display font-black text-2xl sm:text-3xl text-risoBlue">100%</div>
-                <div class="font-mono text-[11px] uppercase tracking-wider text-risoBlue mt-0.5">Clinician-reviewed guides</div>
+                <div class="font-display font-black text-xl sm:text-3xl text-risoBlue">100%</div>
+                <div class="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-risoBlue mt-0.5">Clinician-reviewed guides</div>
               </div>
               <div>
-                <div class="font-display font-black text-2xl sm:text-3xl text-risoRed">Zero</div>
-                <div class="font-mono text-[11px] uppercase tracking-wider text-risoBlue mt-0.5">Judgment or stigma</div>
+                <div class="font-display font-black text-xl sm:text-3xl text-risoRed">Zero</div>
+                <div class="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-risoBlue mt-0.5">Judgment or stigma</div>
               </div>
             </div>
           </div>
 
-          <!-- Right Column: Custom Risograph Overprint Illustration Graphic (5 Cols) -->
-          <div class="lg:col-span-5">
+          <!-- Right Column: Interactive Hero Registration Proofing Stage (5 Cols) -->
+          <div class="lg:col-span-5 riso-reveal is-visible" style="--reveal-delay: 120ms;">
             <div class="relative mx-auto max-w-md">
               <!-- Decorative Offset Paper Layer -->
-              <div class="absolute inset-0 bg-risoRed rounded-2xl translate-x-3 translate-y-3 border-2 border-risoBlue"></div>
+              <div class="absolute inset-0 bg-risoRed rounded-2xl translate-x-2.5 translate-y-2.5 sm:translate-x-3 sm:translate-y-3 border-2 border-risoBlue proof-plate-red"></div>
               
-              <!-- Main Print Card -->
-              <div class="relative bg-paper border-2 border-risoBlue rounded-2xl p-6 sm:p-8 overflow-hidden">
-                <!-- Top Registration Metadata -->
-                <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-risoBlue border-b border-risoBlue/30 pb-3 mb-5">
-                  <span>FIG 01. WHOLE-MAN SPECTRUM</span>
-                  <span>INK: RISO-RED + COBALT</span>
+              <!-- Main Print Proof Card -->
+              <div class="relative bg-paper border-2 border-risoBlue rounded-2xl p-5 sm:p-8 overflow-hidden">
+                <!-- Top Registration Metadata & Interactive Toggle Button -->
+                <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-widest text-risoBlue border-b border-risoBlue/30 pb-3 mb-4">
+                  <span>FIG 01. PRESS PROOF</span>
+                  <button
+                    id="reg-toggle-btn"
+                    type="button"
+                    aria-pressed="false"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border-2 border-risoBlue bg-paperDark hover:bg-risoBlue hover:text-paper text-risoBlue font-mono text-[10px] font-bold uppercase tracking-wider transition-colors min-h-[34px]"
+                  >
+                    <span id="reg-status-dot" class="w-2 h-2 rounded-full bg-risoRed"></span>
+                    <span id="reg-toggle-label">Check Ink Registration</span>
+                  </button>
                 </div>
 
-                <!-- Custom SVG Risograph Illustration: Interlocking Venn & Anatomical Balance -->
-                <div class="relative flex items-center justify-center py-4">
+                <!-- Custom SVG Risograph Illustration: Pointer-Reactive Parallax Plates -->
+                <div class="relative flex items-center justify-center py-2">
                   <svg viewBox="0 0 360 320" class="w-full h-auto max-w-[330px]" role="img" aria-label="Risograph illustration showing overlapping circles of Mind, Body, and Vitality">
                     <defs>
-                      <!-- Halftone Pattern inside SVG -->
                       <pattern id="svgHalftoneBlue" width="6" height="6" patternUnits="userSpaceOnUse">
                         <circle cx="2" cy="2" r="1.4" fill="#0047AB" />
                       </pattern>
@@ -425,18 +617,22 @@
                     <!-- Background Halftone Circle -->
                     <circle cx="180" cy="160" r="122" fill="url(#svgHalftoneBlue)" opacity="0.28" />
 
-                    <!-- Circle 1: Mental Wellness (Blue Ink) -->
-                    <circle cx="145" cy="135" r="78" fill="#0047AB" fill-opacity="0.22" stroke="#0047AB" stroke-width="3" style="mix-blend-mode: multiply;" />
+                    <!-- Circle 1: Mental Wellness (Blue Ink Plate) -->
+                    <g class="proof-plate-blue">
+                      <circle cx="145" cy="135" r="78" fill="#0047AB" fill-opacity="0.22" stroke="#0047AB" stroke-width="3" style="mix-blend-mode: multiply;" />
+                    </g>
                     
-                    <!-- Circle 2: Sexual Vitality (Red Ink, Misregistered) -->
-                    <circle cx="215" cy="135" r="78" fill="#FF2E4C" fill-opacity="0.28" stroke="#FF2E4C" stroke-width="3" style="mix-blend-mode: multiply;" />
+                    <!-- Circle 2: Sexual Vitality (Red Ink Plate - shifts with pointer or toggle) -->
+                    <g class="proof-plate-red">
+                      <circle cx="215" cy="135" r="78" fill="#FF2E4C" fill-opacity="0.28" stroke="#FF2E4C" stroke-width="3" style="mix-blend-mode: multiply;" />
+                    </g>
 
                     <!-- Circle 3: Physical Longevity (Halftone + Ink) -->
                     <circle cx="180" cy="198" r="78" fill="url(#svgHalftoneRed)" fill-opacity="0.45" stroke="#0047AB" stroke-width="3" stroke-dasharray="6 4" style="mix-blend-mode: multiply;" />
 
                     <!-- Center Overprint Core (Deep Violet Blend) -->
                     <circle cx="180" cy="156" r="26" fill="#0047AB" style="mix-blend-mode: multiply;" />
-                    <circle cx="183" cy="159" r="26" fill="#FF2E4C" style="mix-blend-mode: multiply;" />
+                    <circle cx="183" cy="159" r="26" fill="#FF2E4C" class="proof-plate-red" style="mix-blend-mode: multiply;" />
                     
                     <!-- Crisp White Lightning / Pulse Symbol in Core -->
                     <path d="M184 143 L173 158 H182 L178 171 L190 155 H181 Z" fill="#F7F4EB" />
@@ -454,9 +650,9 @@
                 </div>
 
                 <!-- Rotating Stamp Badge Bottom Right -->
-                <div class="mt-3 pt-3 border-t border-risoBlue/30 flex items-center justify-between gap-4">
-                  <p class="font-mono text-xs text-risoInk/80 leading-snug">
-                    <strong>Overprint Principle:</strong> Mental, physical &amp; sexual health don't exist in silos. When one shifts, all three respond.
+                <div class="mt-3 pt-3 border-t border-risoBlue/30 flex items-center justify-between gap-3">
+                  <p id="reg-caption" class="font-mono text-xs text-risoInk/85 leading-snug">
+                    <strong>Overprint Principle:</strong> Move cursor or tap <em>Check Ink Registration</em> to align Mind, Body &amp; Vitality plates.
                   </p>
                   <div class="shrink-0 w-14 h-14 rounded-full border-2 border-risoRed bg-paper flex items-center justify-center relative">
                     <svg class="w-12 h-12 animate-spin-slow text-risoBlue" viewBox="0 0 100 100">
@@ -479,40 +675,71 @@
     </section>
 
     <!-- ========================================================================
-         2. THE THREE CORE PILLARS (INTERACTIVE GRID + DRAWER PREVIEW)
+         RESPONSIVE MARQUEE / TICKER TAPE (PAUSE ON HOVER)
          ======================================================================== -->
-    <section id="pillars" class="py-16 lg:py-24 border-b-2 border-risoBlue relative">
+    <div class="marquee-wrapper bg-risoRed text-paper border-b-2 border-risoBlue py-3 overflow-hidden select-none" aria-label="Editorial focus topics">
+      <div class="marquee-track font-mono text-xs sm:text-sm font-bold uppercase tracking-widest">
+        <div class="flex items-center gap-8 px-4">
+          <span>MENTAL FITNESS WITHOUT STIGMA</span>
+          <span class="text-risoBlue">&diams;</span>
+          <span>VASCULAR &amp; SEXUAL VITALITY</span>
+          <span class="text-risoBlue">&diams;</span>
+          <span>PREVENTIVE BLOODWORK DECODED</span>
+          <span class="text-risoBlue">&diams;</span>
+          <span>SLEEP &amp; CORTISOL RECOVERY</span>
+          <span class="text-risoBlue">&diams;</span>
+          <span>UROLOGIST &amp; THERAPIST REVIEWED</span>
+          <span class="text-risoBlue">&diams;</span>
+        </div>
+        <div class="flex items-center gap-8 px-4" aria-hidden="true">
+          <span>MENTAL FITNESS WITHOUT STIGMA</span>
+          <span class="text-risoBlue">&diams;</span>
+          <span>VASCULAR &amp; SEXUAL VITALITY</span>
+          <span class="text-risoBlue">&diams;</span>
+          <span>PREVENTIVE BLOODWORK DECODED</span>
+          <span class="text-risoBlue">&diams;</span>
+          <span>SLEEP &amp; CORTISOL RECOVERY</span>
+          <span class="text-risoBlue">&diams;</span>
+          <span>UROLOGIST &amp; THERAPIST REVIEWED</span>
+          <span class="text-risoBlue">&diams;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================
+         2. THE THREE CORE PILLARS (INK-BLEED HOVER & PLAYBOOK MODAL)
+         ======================================================================== -->
+    <section id="pillars" class="py-14 sm:py-20 lg:py-24 border-b-2 border-risoBlue relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Section Header -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 riso-reveal">
           <div>
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-risoRed block mb-2">
               // SECTION 01 &mdash; THE FOUNDATION
             </span>
-            <h2 class="font-display font-black text-3xl sm:text-5xl text-risoBlue tracking-tight">
+            <h2 class="font-display font-black fluid-section-title text-risoBlue tracking-tight">
               Three Pillars. <span class="text-risoRed italic">Zero Taboos.</span>
             </h2>
           </div>
-          <p class="text-risoInk/85 max-w-md text-base leading-relaxed">
+          <p class="text-risoInk/85 max-w-md text-sm sm:text-base leading-relaxed">
             Most men wait until something breaks before asking questions. Select any pillar below to inspect key focus areas, practical playbooks, and clinical guides.
           </p>
         </div>
 
         <!-- 3-Column Interactive Pillar Cards -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 lg:gap-8">
           
           <!-- PILLAR 01: MENTAL WELLNESS -->
-          <article class="riso-card rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden group">
-            <!-- Halftone Top Strip -->
-            <div class="absolute top-0 left-0 right-0 h-3 halftone-blue opacity-35"></div>
+          <article class="riso-card rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden group riso-reveal" style="--reveal-delay: 0ms;">
+            <div class="ink-bleed-wash bg-risoBlue"></div>
+            <div class="absolute top-0 left-0 right-0 h-3 halftone-blue opacity-35 riso-plate-align"></div>
             
-            <div>
+            <div class="relative z-10">
               <div class="flex items-center justify-between mb-6 pt-2">
                 <span class="font-mono text-xs font-bold uppercase px-3 py-1 rounded-md bg-risoBlue text-paper">
                   PILLAR 01
                 </span>
-                <!-- Custom Risograph Icon -->
                 <div class="w-12 h-12 rounded-xl border-2 border-risoBlue bg-risoRed/15 flex items-center justify-center text-risoBlue group-hover:bg-risoBlue group-hover:text-paper transition-colors">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -520,14 +747,13 @@
                 </div>
               </div>
 
-              <h3 class="font-display font-black text-2xl sm:text-3xl text-risoBlue mb-3">
+              <h3 class="font-display font-black fluid-card-title text-risoBlue mb-3">
                 Mental Wellness &amp; Resilience
               </h3>
               <p class="text-risoInk/85 text-sm sm:text-base leading-relaxed mb-6">
                 High-functioning doesn't mean unaffected. We unpack silent burnout, anger masked as stress, and what therapy actually looks like when you don't know where to start.
               </p>
 
-              <!-- Key Topics List -->
               <ul class="space-y-2.5 border-t border-risoBlue/25 pt-5 mb-8 font-mono text-xs text-risoBlue">
                 <li class="flex items-center gap-2.5">
                   <span class="w-2 h-2 rounded-full bg-risoRed shrink-0"></span>
@@ -544,8 +770,8 @@
               </ul>
             </div>
 
-            <div class="flex items-center gap-3">
-              <button type="button" onclick="openPillarModal('mental')" class="w-full btn-riso-blue py-3 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2">
+            <div class="relative z-10 flex items-center gap-3">
+              <button type="button" onclick="openPillarModal('mental', this)" class="w-full btn-riso-blue py-3 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2">
                 <span>Inspect Playbook</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -556,16 +782,15 @@
           </article>
 
           <!-- PILLAR 02: SEXUAL HEALTH & VITALITY -->
-          <article class="riso-card-blue-shadow rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden group">
-            <!-- Halftone Top Strip -->
-            <div class="absolute top-0 left-0 right-0 h-3 halftone-red opacity-35"></div>
+          <article class="riso-card-blue-shadow rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden group riso-reveal" style="--reveal-delay: 110ms;">
+            <div class="ink-bleed-wash bg-risoRed"></div>
+            <div class="absolute top-0 left-0 right-0 h-3 halftone-red opacity-35 riso-plate-align"></div>
             
-            <div>
+            <div class="relative z-10">
               <div class="flex items-center justify-between mb-6 pt-2">
                 <span class="font-mono text-xs font-bold uppercase px-3 py-1 rounded-md bg-risoRed text-paper">
                   PILLAR 02
                 </span>
-                <!-- Custom Risograph Icon -->
                 <div class="w-12 h-12 rounded-xl border-2 border-risoRed bg-risoBlue/10 flex items-center justify-center text-risoRed group-hover:bg-risoRed group-hover:text-paper transition-colors">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -573,14 +798,13 @@
                 </div>
               </div>
 
-              <h3 class="font-display font-black text-2xl sm:text-3xl text-risoRed mb-3">
+              <h3 class="font-display font-black fluid-card-title text-risoRed mb-3">
                 Sexual Health &amp; Vitality
               </h3>
               <p class="text-risoInk/85 text-sm sm:text-base leading-relaxed mb-6">
                 Erectile health is vascular health. From performance anxiety and fluctuating libido to routine STI testing and hormone myths—get straight, medically grounded answers.
               </p>
 
-              <!-- Key Topics List -->
               <ul class="space-y-2.5 border-t border-risoRed/25 pt-5 mb-8 font-mono text-xs text-risoInk">
                 <li class="flex items-center gap-2.5">
                   <span class="w-2 h-2 rounded-full bg-risoBlue shrink-0"></span>
@@ -597,8 +821,8 @@
               </ul>
             </div>
 
-            <div class="flex items-center gap-3">
-              <button type="button" onclick="openPillarModal('sexual')" class="w-full btn-riso-red py-3 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2">
+            <div class="relative z-10 flex items-center gap-3">
+              <button type="button" onclick="openPillarModal('sexual', this)" class="w-full btn-riso-red py-3 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2">
                 <span>Inspect Playbook</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -609,16 +833,15 @@
           </article>
 
           <!-- PILLAR 03: PREVENTIVE & PHYSICAL HEALTH -->
-          <article class="riso-card rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden group">
-            <!-- Halftone Top Strip -->
-            <div class="absolute top-0 left-0 right-0 h-3 halftone-blue opacity-35"></div>
+          <article class="riso-card rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden group md:col-span-2 lg:col-span-1 riso-reveal" style="--reveal-delay: 220ms;">
+            <div class="ink-bleed-wash bg-risoBlue"></div>
+            <div class="absolute top-0 left-0 right-0 h-3 halftone-blue opacity-35 riso-plate-align"></div>
             
-            <div>
+            <div class="relative z-10">
               <div class="flex items-center justify-between mb-6 pt-2">
                 <span class="font-mono text-xs font-bold uppercase px-3 py-1 rounded-md bg-risoBlue text-paper">
                   PILLAR 03
                 </span>
-                <!-- Custom Risograph Icon -->
                 <div class="w-12 h-12 rounded-xl border-2 border-risoBlue bg-risoRed/15 flex items-center justify-center text-risoBlue group-hover:bg-risoBlue group-hover:text-paper transition-colors">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -626,14 +849,13 @@
                 </div>
               </div>
 
-              <h3 class="font-display font-black text-2xl sm:text-3xl text-risoBlue mb-3">
+              <h3 class="font-display font-black fluid-card-title text-risoBlue mb-3">
                 Preventive &amp; Physical Health
               </h3>
               <p class="text-risoInk/85 text-sm sm:text-base leading-relaxed mb-6">
                 Longevity isn't built on extreme 4 AM ice baths. It's built on knowing your blood pressure, protecting your sleep architecture, and getting routine bloodwork before 40.
               </p>
 
-              <!-- Key Topics List -->
               <ul class="space-y-2.5 border-t border-risoBlue/25 pt-5 mb-8 font-mono text-xs text-risoBlue">
                 <li class="flex items-center gap-2.5">
                   <span class="w-2 h-2 rounded-full bg-risoRed shrink-0"></span>
@@ -650,8 +872,8 @@
               </ul>
             </div>
 
-            <div class="flex items-center gap-3">
-              <button type="button" onclick="openPillarModal('physical')" class="w-full btn-riso-blue py-3 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2">
+            <div class="relative z-10 flex items-center gap-3">
+              <button type="button" onclick="openPillarModal('physical', this)" class="w-full btn-riso-blue py-3 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2">
                 <span>Inspect Playbook</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -668,24 +890,24 @@
     <!-- ========================================================================
          3. INTERACTIVE SELF-CHECK / QUICK HEALTH PULSE WIDGET
          ======================================================================== -->
-    <section id="pulse-check" class="py-16 lg:py-24 bg-paperDark border-b-2 border-risoBlue relative">
+    <section id="pulse-check" class="py-14 sm:py-20 lg:py-24 bg-paperDark border-b-2 border-risoBlue relative">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Outer Risograph Press Sheet -->
-        <div class="bg-paper border-2 border-risoBlue rounded-3xl p-6 sm:p-10 lg:p-12 shadow-[10px_10px_0px_#0047AB] relative overflow-hidden">
-          <!-- Misregistered Red Accent Border Inside -->
-          <div class="absolute top-3 right-3 font-mono text-[10px] uppercase tracking-widest text-risoRed border border-risoRed px-2.5 py-0.5 rounded">
+        <div class="bg-paper border-2 border-risoBlue rounded-3xl p-5 sm:p-10 lg:p-12 shadow-[8px_8px_0px_#0047AB] sm:shadow-[10px_10px_0px_#0047AB] relative overflow-hidden riso-reveal">
+          <!-- Top Right Privacy Badge -->
+          <div class="inline-block sm:absolute sm:top-5 sm:right-6 mb-4 sm:mb-0 font-mono text-[10px] uppercase tracking-widest text-risoRed border border-risoRed px-2.5 py-1 rounded">
             PRIVATE &bull; NO DATA STORED
           </div>
 
-          <div class="max-w-2xl mb-10">
+          <div class="max-w-2xl mb-8 sm:mb-10">
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-risoBlue block mb-2">
               // SECTION 02 &mdash; INTERACTIVE DIAGNOSTIC
             </span>
-            <h2 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-risoBlue tracking-tight mb-3">
+            <h2 class="font-display font-black fluid-section-title text-risoBlue tracking-tight mb-3">
               The 2-Minute <span class="text-risoRed">Health Pulse Check.</span>
             </h2>
-            <p class="text-risoInk/85 text-base">
+            <p class="text-risoInk/85 text-sm sm:text-base">
               Be honest with yourself—nobody else is watching. Toggle where you honestly stand across these three areas today to generate an immediate, non-judgmental action brief.
             </p>
           </div>
@@ -693,18 +915,18 @@
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
             <!-- Left Side: 3 Interactive Sliders/Toggles (7 Cols) -->
-            <div class="lg:col-span-7 space-y-6">
+            <div class="lg:col-span-7 space-y-5 sm:space-y-6">
               
               <!-- Dimension 1: Sleep & Energy -->
-              <div class="p-5 rounded-2xl border-2 border-risoBlue/30 bg-paper">
-                <div class="flex items-center justify-between mb-3">
+              <div class="p-4 sm:p-5 rounded-2xl border-2 border-risoBlue/30 bg-paper">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <label class="font-mono text-xs font-bold uppercase tracking-wider text-risoBlue flex items-center gap-2">
                     <span class="w-5 h-5 rounded bg-risoBlue text-paper inline-flex items-center justify-center text-[10px]">01</span>
                     Sleep &amp; Baseline Energy
                   </label>
                   <span id="label-sleep" class="font-mono text-xs font-bold text-risoRed">Running on fumes</span>
                 </div>
-                <div class="grid grid-cols-3 gap-2.5" role="group" aria-label="Sleep and Energy level">
+                <div class="grid grid-cols-1 xs:grid-cols-3 sm:grid-cols-3 gap-2.5" role="group" aria-label="Sleep and Energy level">
                   <button type="button" onclick="setPulse('sleep', 0, 'Running on fumes', this)" class="pulse-option active py-2.5 px-3 rounded-xl border-2 border-risoBlue font-mono text-xs font-bold transition-all">
                     Low / Wired
                   </button>
@@ -718,15 +940,15 @@
               </div>
 
               <!-- Dimension 2: Stress & Headspace -->
-              <div class="p-5 rounded-2xl border-2 border-risoBlue/30 bg-paper">
-                <div class="flex items-center justify-between mb-3">
+              <div class="p-4 sm:p-5 rounded-2xl border-2 border-risoBlue/30 bg-paper">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <label class="font-mono text-xs font-bold uppercase tracking-wider text-risoBlue flex items-center gap-2">
                     <span class="w-5 h-5 rounded bg-risoBlue text-paper inline-flex items-center justify-center text-[10px]">02</span>
                     Stress &amp; Mental Load
                   </label>
                   <span id="label-stress" class="font-mono text-xs font-bold text-risoRed">Carrying heavy weight</span>
                 </div>
-                <div class="grid grid-cols-3 gap-2.5" role="group" aria-label="Stress and Headspace level">
+                <div class="grid grid-cols-1 xs:grid-cols-3 sm:grid-cols-3 gap-2.5" role="group" aria-label="Stress and Headspace level">
                   <button type="button" onclick="setPulse('stress', 0, 'Carrying heavy weight', this)" class="pulse-option active py-2.5 px-3 rounded-xl border-2 border-risoBlue font-mono text-xs font-bold transition-all">
                     Overloaded
                   </button>
@@ -740,15 +962,15 @@
               </div>
 
               <!-- Dimension 3: Libido & Sexual Vitality -->
-              <div class="p-5 rounded-2xl border-2 border-risoBlue/30 bg-paper">
-                <div class="flex items-center justify-between mb-3">
+              <div class="p-4 sm:p-5 rounded-2xl border-2 border-risoBlue/30 bg-paper">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <label class="font-mono text-xs font-bold uppercase tracking-wider text-risoBlue flex items-center gap-2">
                     <span class="w-5 h-5 rounded bg-risoBlue text-paper inline-flex items-center justify-center text-[10px]">03</span>
                     Libido &amp; Sexual Confidence
                   </label>
                   <span id="label-vitality" class="font-mono text-xs font-bold text-risoRed">Noticeable dip</span>
                 </div>
-                <div class="grid grid-cols-3 gap-2.5" role="group" aria-label="Libido and Sexual Vitality level">
+                <div class="grid grid-cols-1 xs:grid-cols-3 sm:grid-cols-3 gap-2.5" role="group" aria-label="Libido and Sexual Vitality level">
                   <button type="button" onclick="setPulse('vitality', 0, 'Noticeable dip', this)" class="pulse-option active py-2.5 px-3 rounded-xl border-2 border-risoBlue font-mono text-xs font-bold transition-all">
                     Dipped / Anxious
                   </button>
@@ -765,8 +987,8 @@
 
             <!-- Right Side: Dynamic Risograph Prescription / Brief Output (5 Cols) -->
             <div class="lg:col-span-5">
-              <div id="pulse-result-card" class="rounded-2xl border-2 border-risoRed bg-paper p-6 sm:p-7 shadow-[6px_6px_0px_#FF2E4C] relative">
-                <div class="flex items-center justify-between border-b-2 border-dashed border-risoRed/40 pb-3 mb-4">
+              <div id="pulse-result-card" class="rounded-2xl border-2 border-risoRed bg-paper p-5 sm:p-7 shadow-[6px_6px_0px_#FF2E4C] relative">
+                <div class="flex items-center justify-between border-b-2 border-dashed border-risoRed/40 pb-3 mb-3">
                   <span class="font-mono text-xs font-bold uppercase tracking-wider text-risoRed">
                     YOUR PRINT BRIEF
                   </span>
@@ -775,7 +997,18 @@
                   </span>
                 </div>
 
-                <h3 id="pulse-headline" class="font-display font-black text-2xl text-risoBlue mb-3 leading-snug">
+                <!-- Animated Vitality Index Meter -->
+                <div class="mb-4">
+                  <div class="flex justify-between font-mono text-[10px] uppercase tracking-wider text-risoBlue mb-1">
+                    <span>BASELINE BALANCE INDEX</span>
+                    <span id="pulse-meter-text">15%</span>
+                  </div>
+                  <div class="w-full h-2.5 rounded-full bg-paperDark border border-risoBlue overflow-hidden">
+                    <div id="pulse-meter-fill" class="h-full bg-risoRed transition-all duration-300 ease-out" style="width: 15%;"></div>
+                  </div>
+                </div>
+
+                <h3 id="pulse-headline" class="font-display font-black text-xl sm:text-2xl text-risoBlue mb-3 leading-snug">
                   Your nervous system is stuck in overdrive—and your body is sending receipts.
                 </h3>
 
@@ -819,109 +1052,162 @@
     </section>
 
     <!-- ========================================================================
-         4. EDITORIAL FEATURE: TWO-TONE RED / BLUE MYTH VS. FACT STRIP
+         4. EDITORIAL FEATURE: INTERACTIVE MYTH VS. FACT COMPARISON STRIP
          ======================================================================== -->
-    <section class="border-b-2 border-risoBlue">
-      <div class="grid grid-cols-1 lg:grid-cols-2">
-        
-        <!-- Left Half: RISO RED (THE MYTHS) -->
-        <div class="bg-risoRed text-paper p-8 sm:p-12 lg:p-16 border-b-2 lg:border-b-0 lg:border-r-2 border-risoBlue relative overflow-hidden">
-          <div class="max-w-xl ml-auto space-y-8 relative z-10">
-            <div class="inline-block font-mono text-xs font-bold uppercase tracking-widest bg-risoBlue text-paper px-3 py-1 rounded">
-              OUTDATED SCRIPT // MYTH
-            </div>
-            <h2 class="font-display font-black text-3xl sm:text-4xl leading-tight">
-              What we were told to "man up" and ignore.
+    <section class="py-14 sm:py-20 lg:py-24 border-b-2 border-risoBlue bg-paper">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 riso-reveal">
+          <div>
+            <span class="font-mono text-xs font-bold uppercase tracking-widest text-risoRed block mb-2">
+              // SECTION 03 &mdash; SCRIPT FLIP
+            </span>
+            <h2 class="font-display font-black fluid-section-title text-risoBlue tracking-tight">
+              Outdated Myths vs. <span class="text-risoRed italic">Clinical Reality.</span>
             </h2>
-
-            <div class="space-y-6">
-              <div class="p-5 rounded-2xl border-2 border-paper/40 bg-risoRed">
-                <div class="font-mono text-xs uppercase tracking-wider text-paper/80 mb-1">MYTH 01</div>
-                <p class="font-display font-bold text-xl">
-                  "Keeping stress bottled up is a sign of strength and self-reliance."
-                </p>
-              </div>
-
-              <div class="p-5 rounded-2xl border-2 border-paper/40 bg-risoRed">
-                <div class="font-mono text-xs uppercase tracking-wider text-paper/80 mb-1">MYTH 02</div>
-                <p class="font-display font-bold text-xl">
-                  "Erectile or libido changes only happen to older men—or mean something is broken."
-                </p>
-              </div>
-
-              <div class="p-5 rounded-2xl border-2 border-paper/40 bg-risoRed">
-                <div class="font-mono text-xs uppercase tracking-wider text-paper/80 mb-1">MYTH 03</div>
-                <p class="font-display font-bold text-xl">
-                  "If you look fit on the outside, you don't need routine bloodwork or screenings."
-                </p>
-              </div>
-            </div>
           </div>
+          <p class="font-mono text-xs uppercase tracking-wider text-risoBlue bg-paperDark border-2 border-risoBlue px-3.5 py-2 rounded-lg">
+            TAP OR CLICK ANY CARD TO FLIP RED SCRIPT &rarr; BLUE EVIDENCE
+          </p>
         </div>
 
-        <!-- Right Half: RISO BLUE (THE CLINICAL FACTS) -->
-        <div class="bg-risoBlue text-paper p-8 sm:p-12 lg:p-16 relative overflow-hidden">
-          <div class="max-w-xl mr-auto space-y-8 relative z-10">
-            <div class="inline-block font-mono text-xs font-bold uppercase tracking-widest bg-risoRed text-paper px-3 py-1 rounded">
-              CLINICAL REALITY // FACT
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-7">
+          
+          <!-- Myth vs Fact Card 1 -->
+          <div
+            role="button"
+            tabindex="0"
+            aria-pressed="false"
+            onclick="toggleMythCard(this)"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMythCard(this);}"
+            class="myth-fact-card rounded-2xl border-2 border-risoBlue bg-risoRed text-paper p-6 sm:p-8 shadow-[6px_6px_0px_#0047AB] flex flex-col justify-between min-h-[275px] riso-reveal"
+            style="--reveal-delay: 0ms;"
+          >
+            <div class="myth-face space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs font-bold uppercase tracking-widest bg-risoBlue text-paper px-2.5 py-1 rounded">
+                  MYTH 01 // TAP TO REVEAL FACT
+                </span>
+              </div>
+              <p class="font-display font-bold text-xl sm:text-2xl leading-snug">
+                “Keeping stress bottled up is a sign of strength and self-reliance.”
+              </p>
             </div>
-            <h2 class="font-display font-black text-3xl sm:text-4xl leading-tight">
-              What modern evidence actually proves.
-            </h2>
-
-            <div class="space-y-6">
-              <div class="p-5 rounded-2xl border-2 border-paper/40 bg-risoBlue">
-                <div class="font-mono text-xs uppercase tracking-wider text-risoRed font-bold mb-1">FACT 01</div>
-                <p class="font-sans text-base sm:text-lg leading-relaxed text-paper/95">
-                  Unprocessed chronic stress elevates inflammation and cardiovascular risk. Naming what you're carrying is strategic maintenance, not weakness.
-                </p>
+            <div class="fact-face hidden space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs font-bold uppercase tracking-widest bg-risoRed text-paper px-2.5 py-1 rounded">
+                  CLINICAL FACT 01
+                </span>
               </div>
-
-              <div class="p-5 rounded-2xl border-2 border-paper/40 bg-risoBlue">
-                <div class="font-mono text-xs uppercase tracking-wider text-risoRed font-bold mb-1">FACT 02</div>
-                <p class="font-sans text-base sm:text-lg leading-relaxed text-paper/95">
-                  Over 40% of men under 40 experience occasional performance dips. Often, it's an early dashboard light for sleep, anxiety, or blood flow—and highly treatable.
-                </p>
-              </div>
-
-              <div class="p-5 rounded-2xl border-2 border-paper/40 bg-risoBlue">
-                <div class="font-mono text-xs uppercase tracking-wider text-risoRed font-bold mb-1">FACT 03</div>
-                <p class="font-sans text-base sm:text-lg leading-relaxed text-paper/95">
-                  Hypertension and insulin resistance have zero early symptoms. A 15-minute annual lab panel protects decades of energy and vitality.
-                </p>
-              </div>
+              <p class="font-sans text-base sm:text-lg leading-relaxed text-paper">
+                Unprocessed chronic stress elevates inflammation, blood pressure, and cardiovascular risk. Naming what you're carrying is strategic maintenance, not weakness.
+              </p>
+            </div>
+            <div class="pt-5 mt-5 border-t border-paper/30 flex items-center justify-between font-mono text-xs uppercase tracking-wider">
+              <span class="card-cta-label">Flip to Clinical Evidence</span>
+              <span>&#8644;</span>
             </div>
           </div>
-        </div>
 
+          <!-- Myth vs Fact Card 2 -->
+          <div
+            role="button"
+            tabindex="0"
+            aria-pressed="false"
+            onclick="toggleMythCard(this)"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMythCard(this);}"
+            class="myth-fact-card rounded-2xl border-2 border-risoBlue bg-risoRed text-paper p-6 sm:p-8 shadow-[6px_6px_0px_#0047AB] flex flex-col justify-between min-h-[275px] riso-reveal"
+            style="--reveal-delay: 110ms;"
+          >
+            <div class="myth-face space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs font-bold uppercase tracking-widest bg-risoBlue text-paper px-2.5 py-1 rounded">
+                  MYTH 02 // TAP TO REVEAL FACT
+                </span>
+              </div>
+              <p class="font-display font-bold text-xl sm:text-2xl leading-snug">
+                “Erectile or libido changes only happen to older men—or mean something is broken.”
+              </p>
+            </div>
+            <div class="fact-face hidden space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs font-bold uppercase tracking-widest bg-risoRed text-paper px-2.5 py-1 rounded">
+                  CLINICAL FACT 02
+                </span>
+              </div>
+              <p class="font-sans text-base sm:text-lg leading-relaxed text-paper">
+                Over 40% of men under 40 experience occasional performance dips. Often, it's an early dashboard light for sleep, anxiety, or blood flow—and highly treatable.
+              </p>
+            </div>
+            <div class="pt-5 mt-5 border-t border-paper/30 flex items-center justify-between font-mono text-xs uppercase tracking-wider">
+              <span class="card-cta-label">Flip to Clinical Evidence</span>
+              <span>&#8644;</span>
+            </div>
+          </div>
+
+          <!-- Myth vs Fact Card 3 -->
+          <div
+            role="button"
+            tabindex="0"
+            aria-pressed="false"
+            onclick="toggleMythCard(this)"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMythCard(this);}"
+            class="myth-fact-card rounded-2xl border-2 border-risoBlue bg-risoRed text-paper p-6 sm:p-8 shadow-[6px_6px_0px_#0047AB] flex flex-col justify-between min-h-[275px] riso-reveal"
+            style="--reveal-delay: 220ms;"
+          >
+            <div class="myth-face space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs font-bold uppercase tracking-widest bg-risoBlue text-paper px-2.5 py-1 rounded">
+                  MYTH 03 // TAP TO REVEAL FACT
+                </span>
+              </div>
+              <p class="font-display font-bold text-xl sm:text-2xl leading-snug">
+                “If you look fit on the outside, you don't need routine bloodwork or screenings.”
+              </p>
+            </div>
+            <div class="fact-face hidden space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs font-bold uppercase tracking-widest bg-risoRed text-paper px-2.5 py-1 rounded">
+                  CLINICAL FACT 03
+                </span>
+              </div>
+              <p class="font-sans text-base sm:text-lg leading-relaxed text-paper">
+                Hypertension and insulin resistance have zero early symptoms. A 15-minute annual lab panel protects decades of energy, heart health, and vitality.
+              </p>
+            </div>
+            <div class="pt-5 mt-5 border-t border-paper/30 flex items-center justify-between font-mono text-xs uppercase tracking-wider">
+              <span class="card-cta-label">Flip to Clinical Evidence</span>
+              <span>&#8644;</span>
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
 
     <!-- ========================================================================
          5. COMMUNITY VOICES / ZINE CLIPPING PULL-QUOTES
          ======================================================================== -->
-    <section class="py-16 lg:py-24 border-b-2 border-risoBlue relative">
+    <section class="py-14 sm:py-20 lg:py-24 border-b-2 border-risoBlue relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="text-center max-w-2xl mx-auto mb-14">
+        <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-14 riso-reveal">
           <span class="font-mono text-xs font-bold uppercase tracking-widest text-risoRed block mb-2">
-            // SECTION 03 &mdash; FIELD NOTES
+            // SECTION 04 &mdash; FIELD NOTES
           </span>
-          <h2 class="font-display font-black text-3xl sm:text-5xl text-risoBlue tracking-tight mb-4">
+          <h2 class="font-display font-black fluid-section-title text-risoBlue tracking-tight mb-4">
             Real Men. <span class="italic text-risoRed">Unedited Notes.</span>
           </h2>
-          <p class="text-risoInk/85 text-base">
+          <p class="text-risoInk/85 text-sm sm:text-base">
             Stories from readers who stopped guessing in isolation and started treating their health like something worth showing up for.
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-7 lg:gap-8">
           
           <!-- Zine Clipping 1 -->
-          <figure class="riso-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between">
+          <figure class="riso-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between riso-reveal" style="--reveal-delay: 0ms;">
             <div>
               <div class="flex items-center justify-between mb-5">
-                <!-- Halftone Monogram Portrait -->
                 <div class="relative w-12 h-12 rounded-full border-2 border-risoBlue halftone-dense-blue flex items-center justify-center bg-paper">
                   <span class="font-display font-black text-lg text-risoRed bg-paper px-1.5 rounded">M.K.</span>
                 </div>
@@ -929,7 +1215,7 @@
                   AGE 34 &bull; ARCHITECT
                 </span>
               </div>
-              <blockquote class="font-display font-bold text-xl text-risoBlue leading-snug mb-4">
+              <blockquote class="font-display font-bold text-lg sm:text-xl text-risoBlue leading-snug mb-4">
                 “I thought my exhaustion and zero sex drive were just part of turning 34. Turns out my sleep apnea and cortisol were through the roof.”
               </blockquote>
             </div>
@@ -939,10 +1225,9 @@
           </figure>
 
           <!-- Zine Clipping 2 -->
-          <figure class="riso-card-blue-shadow rounded-2xl p-6 sm:p-7 flex flex-col justify-between">
+          <figure class="riso-card-blue-shadow rounded-2xl p-6 sm:p-7 flex flex-col justify-between riso-reveal" style="--reveal-delay: 110ms;">
             <div>
               <div class="flex items-center justify-between mb-5">
-                <!-- Halftone Monogram Portrait -->
                 <div class="relative w-12 h-12 rounded-full border-2 border-risoRed halftone-red flex items-center justify-center bg-paper">
                   <span class="font-display font-black text-lg text-risoBlue bg-paper px-1.5 rounded">D.R.</span>
                 </div>
@@ -950,7 +1235,7 @@
                   AGE 29 &bull; TEACHER
                 </span>
               </div>
-              <blockquote class="font-display font-bold text-xl text-risoInk leading-snug mb-4">
+              <blockquote class="font-display font-bold text-lg sm:text-xl text-risoInk leading-snug mb-4">
                 “Having a plain-English script for what to ask my doctor about STI testing and anxiety took away 90% of the dread.”
               </blockquote>
             </div>
@@ -960,10 +1245,9 @@
           </figure>
 
           <!-- Zine Clipping 3 -->
-          <figure class="riso-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between">
+          <figure class="riso-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between riso-reveal" style="--reveal-delay: 220ms;">
             <div>
               <div class="flex items-center justify-between mb-5">
-                <!-- Halftone Monogram Portrait -->
                 <div class="relative w-12 h-12 rounded-full border-2 border-risoBlue halftone-dense-blue flex items-center justify-center bg-paper">
                   <span class="font-display font-black text-lg text-risoRed bg-paper px-1.5 rounded">A.S.</span>
                 </div>
@@ -971,7 +1255,7 @@
                   AGE 42 &bull; FOUNDER
                 </span>
               </div>
-              <blockquote class="font-display font-bold text-xl text-risoBlue leading-snug mb-4">
+              <blockquote class="font-display font-bold text-lg sm:text-xl text-risoBlue leading-snug mb-4">
                 “No alpha-male posturing, no sketchy supplement ads. Just honest clarity that helped me open up to my partner and my therapist.”
               </blockquote>
             </div>
@@ -987,18 +1271,18 @@
     <!-- ========================================================================
          6. NEWSLETTER & CONFIDENTIAL DISPATCH CTA ("THE MONTHLY PRESS")
          ======================================================================== -->
-    <section class="py-16 lg:py-20 bg-paperDark relative overflow-hidden">
+    <section class="py-14 sm:py-20 bg-paperDark relative overflow-hidden">
       <div class="absolute inset-0 halftone-blue opacity-10 pointer-events-none"></div>
 
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="bg-paper border-2 border-risoBlue rounded-3xl p-8 sm:p-12 shadow-[8px_8px_0px_#FF2E4C]">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 riso-reveal">
+        <div class="bg-paper border-2 border-risoBlue rounded-3xl p-6 sm:p-12 shadow-[8px_8px_0px_#FF2E4C]">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             <div class="lg:col-span-7 space-y-3">
               <div class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-risoRed">
                 <span>DISPATCH // ONCE A MONTH</span>
               </div>
-              <h2 class="font-display font-black text-3xl sm:text-4xl text-risoBlue tracking-tight">
+              <h2 class="font-display font-black fluid-section-title text-risoBlue tracking-tight">
                 Subscribe to <span class="italic text-risoRed">The Monthly Press.</span>
               </h2>
               <p class="text-risoInk/85 text-sm sm:text-base leading-relaxed">
@@ -1015,13 +1299,15 @@
                     type="email"
                     required
                     placeholder="you@domain.com"
-                    class="w-full px-4 py-3.5 rounded-xl border-2 border-risoBlue bg-paper font-mono text-sm text-risoInk placeholder:text-risoInk/45 focus:outline-none focus:ring-2 focus:ring-risoRed"
+                    class="w-full min-h-[48px] px-4 py-3.5 rounded-xl border-2 border-risoBlue bg-paper font-mono text-sm text-risoInk placeholder:text-risoInk/45 focus:outline-none focus:ring-2 focus:ring-risoRed"
                   />
                 </div>
                 <button type="submit" class="w-full btn-riso-red py-3.5 px-6 rounded-xl font-mono text-xs font-bold uppercase tracking-wider">
                   Send Me The Dispatch &rarr;
                 </button>
-                <p id="newsletter-feedback" class="font-mono text-xs text-risoBlue min-h-[1.25rem]" role="status"></p>
+                <div id="newsletter-feedback-wrap" class="min-h-[1.75rem] flex items-center">
+                  <p id="newsletter-feedback" class="font-mono text-xs text-risoBlue" role="status"></p>
+                </div>
               </form>
             </div>
 
@@ -1139,10 +1425,129 @@
   </div>
 
   <!-- ========================================================================
-       JAVASCRIPT: MOBILE MENU, INTERACTIVE PULSE CHECK & PILLAR MODAL
+       INTERACTIVE PILLAR PLAYBOOK MODAL (FOCUS TRAP + STAMP ENTRANCE)
+       ======================================================================== -->
+  <div id="pillar-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-risoInk/70 backdrop-blur-xs" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div id="pillar-modal-panel" class="bg-paper border-2 border-risoBlue rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-[10px_10px_0px_#FF2E4C] relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b-2 border-risoBlue/20 pb-4 mb-5">
+        <span id="modal-tag" class="font-mono text-xs font-bold uppercase px-2.5 py-1 rounded bg-risoRed text-paper">
+          PILLAR BRIEF
+        </span>
+        <button id="modal-close-btn" type="button" onclick="closePillarModal()" class="min-w-[44px] min-h-[44px] p-2 rounded-lg border-2 border-risoBlue text-risoBlue hover:bg-risoBlue hover:text-paper transition-colors flex items-center justify-center" aria-label="Close modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <h3 id="modal-title" class="font-display font-black text-2xl sm:text-3xl text-risoBlue mb-3">
+        Pillar Title
+      </h3>
+      <p id="modal-summary" class="text-sm sm:text-base text-risoInk/90 leading-relaxed mb-5">
+        Summary goes here.
+      </p>
+
+      <div class="bg-paperDark rounded-xl p-4 border border-risoBlue/30 mb-6">
+        <div class="font-mono text-xs font-bold uppercase tracking-wider text-risoBlue mb-3">
+          FEATURED GUIDES IN THIS PILLAR:
+        </div>
+        <ul id="modal-guides" class="space-y-2.5 text-sm text-risoInk"></ul>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href="resources.html" class="flex-1 btn-riso-red py-3 px-5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider text-center flex items-center justify-center">
+          Read Full Guides &rarr;
+        </a>
+        <button type="button" onclick="closePillarModal()" class="btn-riso-outline py-3 px-5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider">
+          Close Preview
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       JAVASCRIPT: CALIBRATION, REGISTRATION PROOFING, OBSERVER & INTERACTIONS
        ======================================================================== -->
   <script>
-    // 1. Mobile Navigation Toggle
+    // 0. Press-Proof Calibration Preloader Dismissal
+    window.addEventListener('DOMContentLoaded', () => {
+      const preloader = document.getElementById('press-preloader');
+      setTimeout(() => {
+        if (preloader) preloader.classList.add('loaded');
+      }, 420);
+    });
+
+    // 1. Top Viewport Scroll-Progress Ink Meter
+    const scrollInkBar = document.getElementById('scroll-ink-bar');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+      scrollInkBar.style.width = pct + '%';
+      scrollInkBar.setAttribute('aria-valuenow', Math.round(pct));
+    }, { passive: true });
+
+    // 2. Scroll-Triggered Risograph Ink Registration Observer
+    const revealElements = document.querySelectorAll('.riso-reveal');
+    if ('IntersectionObserver' in window) {
+      const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+
+      revealElements.forEach(el => revealObserver.observe(el));
+    } else {
+      revealElements.forEach(el => el.classList.add('is-visible'));
+    }
+
+    // 3. Hero Interactive Registration Proofing Stage (Pointer Parallax + Alignment Toggle)
+    const heroStage = document.getElementById('hero-stage');
+    const regToggleBtn = document.getElementById('reg-toggle-btn');
+    const regToggleLabel = document.getElementById('reg-toggle-label');
+    const regStatusDot = document.getElementById('reg-status-dot');
+    const regCaption = document.getElementById('reg-caption');
+    let isPlatesAligned = false;
+
+    if (heroStage && regToggleBtn) {
+      heroStage.addEventListener('pointermove', (e) => {
+        if (isPlatesAligned || e.pointerType === 'touch') return;
+        const rect = heroStage.getBoundingClientRect();
+        const relX = ((e.clientX - rect.left) / rect.width - 0.5) * 14;
+        const relY = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
+        document.documentElement.style.setProperty('--plate-x', `${relX.toFixed(1)}px`);
+        document.documentElement.style.setProperty('--plate-y', `${relY.toFixed(1)}px`);
+      });
+
+      heroStage.addEventListener('pointerleave', () => {
+        if (isPlatesAligned) return;
+        document.documentElement.style.setProperty('--plate-x', '4px');
+        document.documentElement.style.setProperty('--plate-y', '3px');
+      });
+
+      regToggleBtn.addEventListener('click', () => {
+        isPlatesAligned = !isPlatesAligned;
+        regToggleBtn.setAttribute('aria-pressed', String(isPlatesAligned));
+        if (isPlatesAligned) {
+          document.documentElement.style.setProperty('--plate-x', '0px');
+          document.documentElement.style.setProperty('--plate-y', '0px');
+          regToggleLabel.textContent = 'Plates Aligned (0.0mm)';
+          regStatusDot.className = 'w-2 h-2 rounded-full bg-risoBlue';
+          regCaption.innerHTML = '<strong>Perfect Registration:</strong> When Mind, Body &amp; Vitality align, whole-man resilience locks into place.';
+        } else {
+          document.documentElement.style.setProperty('--plate-x', '5px');
+          document.documentElement.style.setProperty('--plate-y', '4px');
+          regToggleLabel.textContent = 'Check Ink Registration';
+          regStatusDot.className = 'w-2 h-2 rounded-full bg-risoRed';
+          regCaption.innerHTML = '<strong>Overprint Principle:</strong> Move cursor or tap <em>Check Ink Registration</em> to align Mind, Body &amp; Vitality plates.';
+        }
+      });
+    }
+
+    // 4. Mobile Navigation Toggle
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     const menuIconOpen = document.getElementById('menu-icon-open');
@@ -1150,13 +1555,22 @@
 
     mobileMenuBtn.addEventListener('click', () => {
       const isExpanded = mobileMenuBtn.getAttribute('aria-expanded') === 'true';
-      mobileMenuBtn.setAttribute('aria-expanded', !isExpanded);
+      mobileMenuBtn.setAttribute('aria-expanded', String(!isExpanded));
       mobileMenu.classList.toggle('hidden');
       menuIconOpen.classList.toggle('hidden');
       menuIconClose.classList.toggle('hidden');
     });
 
-    // 2. Interactive 2-Minute Health Pulse Check Logic
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+        menuIconOpen.classList.remove('hidden');
+        menuIconClose.classList.add('hidden');
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    // 5. Interactive 2-Minute Health Pulse Check Logic with Animated Stamp & Meter
     const pulseState = {
       sleep: 0,
       stress: 0,
@@ -1165,11 +1579,8 @@
 
     function setPulse(category, score, labelText, btnElement) {
       pulseState[category] = score;
-
-      // Update status label
       document.getElementById(`label-${category}`).textContent = labelText;
 
-      // Update active styling on sibling buttons
       const parentGroup = btnElement.parentElement;
       parentGroup.querySelectorAll('.pulse-option').forEach(btn => {
         btn.classList.remove('active');
@@ -1187,10 +1598,23 @@
       const headline = document.getElementById('pulse-headline');
       const body = document.getElementById('pulse-body');
       const actions = document.getElementById('pulse-actions');
+      const meterFill = document.getElementById('pulse-meter-fill');
+      const meterText = document.getElementById('pulse-meter-text');
+      const resultCard = document.getElementById('pulse-result-card');
+
+      // Re-trigger stamp animation on update
+      resultCard.classList.remove('stamp-animate');
+      void resultCard.offsetWidth;
+      resultCard.classList.add('stamp-animate');
+
+      const pct = Math.round(((total + 1) / 7) * 100);
+      meterFill.style.width = `${pct}%`;
+      meterText.textContent = `${pct}%`;
 
       if (total <= 2) {
         badge.textContent = 'PRIORITY: RESET';
         badge.className = 'font-mono text-xs font-bold bg-risoRed text-paper px-2.5 py-0.5 rounded';
+        meterFill.className = 'h-full bg-risoRed transition-all duration-300 ease-out';
         headline.textContent = 'Your nervous system is stuck in overdrive—and your body is sending receipts.';
         body.textContent = 'Chronic sleep debt and unaddressed stress spike cortisol, which directly suppresses testosterone and blood flow. This isn’t a personal failure—it’s basic physiology.';
         actions.innerHTML = `
@@ -1201,6 +1625,7 @@
       } else if (total <= 4) {
         badge.textContent = 'PRIORITY: RECALIBRATE';
         badge.className = 'font-mono text-xs font-bold bg-risoBlue text-paper px-2.5 py-0.5 rounded';
+        meterFill.className = 'h-full bg-risoBlue transition-all duration-300 ease-out';
         headline.textContent = 'You’re holding the line, but running with hidden friction.';
         body.textContent = 'You’re functioning well day-to-day, yet fluctuations in recovery or headspace are capping your energy and confidence. Small targeted adjustments go a long way here.';
         actions.innerHTML = `
@@ -1211,6 +1636,7 @@
       } else {
         badge.textContent = 'PRIORITY: OPTIMIZE';
         badge.className = 'font-mono text-xs font-bold bg-risoBlue text-paper px-2.5 py-0.5 rounded';
+        meterFill.className = 'h-full bg-risoBlue transition-all duration-300 ease-out';
         headline.textContent = 'Strong baseline across mind, recovery, and vitality.';
         body.textContent = 'Your core systems are aligned. Now is the ideal time to lock in preventive screenings and build long-term resilience so you stay ahead of the curve.';
         actions.innerHTML = `
@@ -1221,7 +1647,35 @@
       }
     }
 
-    // 3. Pillar Playbook Modal Data & Handlers
+    // 6. Interactive Myth vs. Fact Card Toggle (Touch & Keyboard Accessible)
+    function toggleMythCard(cardEl) {
+      const isFact = cardEl.getAttribute('aria-pressed') === 'true';
+      const mythFace = cardEl.querySelector('.myth-face');
+      const factFace = cardEl.querySelector('.fact-face');
+      const ctaLabel = cardEl.querySelector('.card-cta-label');
+
+      cardEl.classList.remove('stamp-animate');
+      void cardEl.offsetWidth;
+      cardEl.classList.add('stamp-animate');
+
+      if (!isFact) {
+        cardEl.setAttribute('aria-pressed', 'true');
+        cardEl.classList.remove('bg-risoRed', 'border-risoBlue', 'shadow-[6px_6px_0px_#0047AB]');
+        cardEl.classList.add('bg-risoBlue', 'border-risoRed', 'shadow-[6px_6px_0px_#FF2E4C]');
+        mythFace.classList.add('hidden');
+        factFace.classList.remove('hidden');
+        ctaLabel.textContent = 'Flip Back to Myth';
+      } else {
+        cardEl.setAttribute('aria-pressed', 'false');
+        cardEl.classList.remove('bg-risoBlue', 'border-risoRed', 'shadow-[6px_6px_0px_#FF2E4C]');
+        cardEl.classList.add('bg-risoRed', 'border-risoBlue', 'shadow-[6px_6px_0px_#0047AB]');
+        factFace.classList.add('hidden');
+        mythFace.classList.remove('hidden');
+        ctaLabel.textContent = 'Flip to Clinical Evidence';
+      }
+    }
+
+    // 7. Pillar Playbook Modal Data, Focus Trap & Handlers
     const pillarData = {
       mental: {
         tag: 'PILLAR 01 // MENTAL WELLNESS',
@@ -1255,9 +1709,12 @@
       }
     };
 
-    function openPillarModal(key) {
+    let lastFocusedElement = null;
+
+    function openPillarModal(key, triggerBtn) {
       const data = pillarData[key];
       if (!data) return;
+      lastFocusedElement = triggerBtn || document.activeElement;
 
       document.getElementById('modal-tag').textContent = data.tag;
       document.getElementById('modal-title').textContent = data.title;
@@ -1272,25 +1729,56 @@
       `).join('');
 
       const modal = document.getElementById('pillar-modal');
+      const panel = document.getElementById('pillar-modal-panel');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
+      panel.classList.remove('modal-panel-enter');
+      void panel.offsetWidth;
+      panel.classList.add('modal-panel-enter');
+
+      document.getElementById('modal-close-btn').focus();
     }
 
     function closePillarModal() {
       const modal = document.getElementById('pillar-modal');
+      if (modal.classList.contains('hidden')) return;
       modal.classList.add('hidden');
       modal.classList.remove('flex');
+      if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+        lastFocusedElement.focus();
+      }
     }
 
-    // Close modal on Escape key or backdrop click
+    // Focus Trap & Escape Handler for Modal
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closePillarModal();
+      const modal = document.getElementById('pillar-modal');
+      if (modal.classList.contains('hidden')) return;
+
+      if (e.key === 'Escape') {
+        closePillarModal();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        const focusables = modal.querySelectorAll('a[href], button:not([disabled])');
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     });
+
     document.getElementById('pillar-modal').addEventListener('click', (e) => {
       if (e.target.id === 'pillar-modal') closePillarModal();
     });
 
-    // 4. Newsletter Form Submission Feedback (No alert())
+    // 8. Newsletter Form Submission Feedback with Stamped Badge (No alert())
     const newsletterForm = document.getElementById('newsletter-form');
     const newsletterInput = document.getElementById('newsletter-email');
     const newsletterFeedback = document.getElementById('newsletter-feedback');
@@ -1298,13 +1786,16 @@
     newsletterForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const email = newsletterInput.value.trim();
+      newsletterFeedback.classList.remove('stamp-animate');
+      void newsletterFeedback.offsetWidth;
+
       if (!email || !email.includes('@')) {
-        newsletterFeedback.textContent = 'Please enter a valid email address.';
-        newsletterFeedback.className = 'font-mono text-xs text-risoRed font-bold min-h-[1.25rem]';
+        newsletterFeedback.innerHTML = '<span class="inline-block px-2.5 py-1 rounded border border-risoRed bg-risoRed/10 text-risoRed font-bold">ERROR // Please enter a valid email address.</span>';
+        newsletterFeedback.classList.add('stamp-animate');
         return;
       }
-      newsletterFeedback.textContent = 'Confirmed. Welcome to The Monthly Press — check your inbox.';
-      newsletterFeedback.className = 'font-mono text-xs text-risoBlue font-bold min-h-[1.25rem]';
+      newsletterFeedback.innerHTML = '<span class="inline-block px-3 py-1 rounded border-2 border-risoBlue bg-risoBlue text-paper font-bold">STAMPED &amp; CONFIRMED // Welcome to The Monthly Press.</span>';
+      newsletterFeedback.classList.add('stamp-animate');
       newsletterInput.value = '';
     });
   </script>

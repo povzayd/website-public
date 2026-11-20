@@ -1,0 +1,3799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MEN / WELL — Men's Health & Wellbeing</title>
+
+<meta name="description"
+content="A thoughtful space for men's physical health, mental wellbeing, relationships and purpose.">
+
+<!-- =========================================================
+     FONTS
+========================================================= -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- =========================================================
+     ICONS
+========================================================= -->
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+
+<style>
+
+/* =========================================================
+   ROOT / DESIGN SYSTEM
+========================================================= */
+
+:root {
+
+    --ivory: #f3f0e8;
+    --paper: #e9e5da;
+
+    --charcoal: #191b19;
+    --forest: #27352f;
+    --forest-dark: #18221e;
+
+    --olive: #70786d;
+    --stone: #aaa398;
+
+    --burgundy: #704342;
+
+    --white: #f8f7f3;
+
+    --serif: "DM Serif Display", Georgia, serif;
+    --sans: "Manrope", Arial, sans-serif;
+
+    --container: 1380px;
+
+    --ease: cubic-bezier(.22,.61,.36,1);
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--ivory);
+    color: var(--charcoal);
+    font-family: var(--sans);
+    overflow-x: hidden;
+}
+
+body::before {
+
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: 9999;
+
+    opacity: .035;
+
+    background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+}
+
+img {
+    display: block;
+    width: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font-family: inherit;
+}
+
+::selection {
+    background: var(--forest);
+    color: var(--ivory);
+}
+
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+.container {
+    width: min(var(--container), calc(100% - 80px));
+    margin-inline: auto;
+}
+
+.section {
+    padding: 150px 0;
+}
+
+.display {
+    font-family: var(--serif);
+    font-weight: 400;
+
+    font-size: clamp(4rem, 7vw, 8rem);
+
+    line-height: .9;
+
+    letter-spacing: -.055em;
+}
+
+.display em,
+h2 em {
+    color: var(--burgundy);
+    font-style: italic;
+}
+
+.meta {
+
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: .18em;
+
+    text-transform: uppercase;
+
+    color: var(--olive);
+}
+
+.meta .number {
+    color: var(--burgundy);
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+header {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+
+    height: 84px;
+
+    padding: 0 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    z-index: 1000;
+
+    color: var(--white);
+
+    transition:
+        height .4s ease,
+        background .4s ease,
+        color .4s ease;
+}
+
+header.scrolled {
+
+    height: 68px;
+
+    color: var(--charcoal);
+
+    background: rgba(243,240,232,.88);
+
+    backdrop-filter: blur(20px);
+
+    border-bottom: 1px solid rgba(25,27,25,.1);
+}
+
+.logo {
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: .13em;
+}
+
+.logo-mark {
+
+    width: 31px;
+    height: 31px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid currentColor;
+
+    border-radius: 50%;
+
+    font-family: var(--serif);
+
+    font-size: 17px;
+}
+
+.logo span:last-child em {
+    opacity: .4;
+    font-style: normal;
+}
+
+nav {
+
+    display: flex;
+
+    gap: 30px;
+}
+
+nav a {
+
+    position: relative;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: .1em;
+
+    text-transform: uppercase;
+}
+
+nav a::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    bottom: -6px;
+
+    width: 0;
+    height: 1px;
+
+    background: currentColor;
+
+    transition: width .3s ease;
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+.menu-btn {
+
+    display: none;
+
+    border: 0;
+
+    background: none;
+
+    color: currentColor;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+.mobile-menu {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: var(--forest-dark);
+
+    color: var(--white);
+
+    z-index: 2000;
+
+    transform: translateY(-100%);
+
+    transition: transform .7s var(--ease);
+}
+
+.mobile-menu.active {
+    transform: translateY(0);
+}
+
+.mobile-close {
+
+    position: absolute;
+
+    top: 30px;
+    right: 30px;
+
+    border: 0;
+
+    background: none;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+.mobile-menu-inner {
+
+    height: 100%;
+
+    padding: 100px 30px 30px;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+.mobile-label {
+
+    font-size: 9px;
+
+    letter-spacing: .2em;
+
+    opacity: .45;
+
+    margin-bottom: 30px;
+}
+
+.mobile-menu a {
+
+    font-family: var(--serif);
+
+    font-size: clamp(3rem, 12vw, 5rem);
+
+    line-height: 1;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid rgba(255,255,255,.12);
+}
+
+.mobile-footer {
+
+    margin-top: auto;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    font-size: 9px;
+
+    letter-spacing: .1em;
+
+    opacity: .4;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+
+    position: relative;
+
+    height: 100svh;
+
+    min-height: 720px;
+
+    color: white;
+
+    overflow: hidden;
+
+    display: flex;
+
+    align-items: center;
+}
+
+.hero-image {
+
+    position: absolute;
+
+    inset: -5%;
+
+    z-index: -2;
+}
+
+.hero-image img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    filter:
+        saturate(.6)
+        contrast(1.05);
+
+    animation: heroZoom 12s var(--ease) forwards;
+}
+
+@keyframes heroZoom {
+
+    from {
+        transform: scale(1.08);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}
+
+.hero-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: -1;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(10,15,13,.88) 0%,
+            rgba(10,15,13,.55) 45%,
+            rgba(10,15,13,.12) 100%
+        );
+}
+
+.hero-content {
+
+    width: min(1250px, calc(100% - 80px));
+
+    margin-inline: auto;
+
+    padding-top: 70px;
+}
+
+.hero-kicker {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: .18em;
+}
+
+.hero-kicker::before {
+
+    content: "";
+
+    width: 32px;
+
+    height: 1px;
+
+    background: currentColor;
+}
+
+.hero h1 {
+
+    max-width: 900px;
+
+    margin: 35px 0 30px;
+
+    font-family: var(--serif);
+
+    font-weight: 400;
+
+    font-size: clamp(4.5rem, 9vw, 10rem);
+
+    line-height: .83;
+
+    letter-spacing: -.06em;
+}
+
+.hero h1 em {
+
+    color: #d0b4a5;
+
+    font-style: italic;
+}
+
+.hero-copy {
+
+    max-width: 500px;
+
+    color: rgba(255,255,255,.75);
+
+    font-size: 15px;
+
+    line-height: 1.8;
+
+    margin-bottom: 35px;
+}
+
+.button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 15px 20px;
+
+    border: 1px solid rgba(255,255,255,.5);
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .14em;
+
+    text-transform: uppercase;
+
+    transition:
+        background .3s ease,
+        color .3s ease,
+        transform .3s ease;
+}
+
+.button:hover {
+
+    background: white;
+
+    color: var(--charcoal);
+
+    transform: translateY(-3px);
+}
+
+.button svg {
+    width: 15px;
+}
+
+.hero-bottom {
+
+    position: absolute;
+
+    bottom: 35px;
+
+    left: 40px;
+    right: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    font-size: 8px;
+
+    letter-spacing: .17em;
+
+    opacity: .6;
+}
+
+.hero-bottom .page {
+    margin-left: auto;
+}
+
+.scroll-line {
+
+    width: 110px;
+
+    height: 1px;
+
+    background: rgba(255,255,255,.3);
+
+    overflow: hidden;
+}
+
+.scroll-line span {
+
+    display: block;
+
+    width: 30%;
+
+    height: 100%;
+
+    background: white;
+
+    animation: scrollLine 2s infinite ease-in-out;
+}
+
+@keyframes scrollLine {
+
+    from {
+        transform: translateX(-150%);
+    }
+
+    to {
+        transform: translateX(400%);
+    }
+}
+
+
+/* =========================================================
+   MANIFESTO
+========================================================= */
+
+.manifesto-grid {
+
+    display: grid;
+
+    grid-template-columns: 1.35fr .65fr;
+
+    gap: 100px;
+
+    margin-top: 75px;
+}
+
+.manifesto-copy {
+
+    max-width: 430px;
+}
+
+.manifesto-copy p {
+
+    color: #5c5c56;
+
+    font-size: 15px;
+
+    line-height: 1.85;
+
+    margin-bottom: 24px;
+}
+
+.text-link {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .13em;
+
+    text-transform: uppercase;
+
+    border-bottom: 1px solid;
+
+    padding-bottom: 6px;
+}
+
+
+/* =========================================================
+   PILLARS
+========================================================= */
+
+.pillars {
+
+    background: var(--paper);
+}
+
+.section-heading {
+
+    margin-bottom: 70px;
+}
+
+.section-heading h2 {
+
+    font-family: var(--serif);
+
+    font-weight: 400;
+
+    font-size: clamp(4rem, 7vw, 7.5rem);
+
+    line-height: .9;
+
+    letter-spacing: -.05em;
+
+    margin-top: 35px;
+}
+
+.pillar-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(2,1fr);
+
+    gap: 22px;
+}
+
+.pillar {
+
+    min-height: 680px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    color: white;
+
+    display: flex;
+
+    align-items: flex-end;
+}
+
+.pillar-image {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 0;
+}
+
+.pillar-image img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    opacity: .48;
+
+    filter: saturate(.7);
+
+    transition:
+        transform 1.1s var(--ease),
+        opacity .5s ease;
+}
+
+.pillar:hover img {
+
+    transform: scale(1.06);
+
+    opacity: .6;
+}
+
+.pillar::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            transparent 20%,
+            rgba(0,0,0,.78) 100%
+        );
+
+    z-index: 1;
+}
+
+.pillar:nth-child(1) {
+    background: #27352f;
+}
+
+.pillar:nth-child(2) {
+    background: #51574e;
+}
+
+.pillar:nth-child(3) {
+    background: #634c47;
+}
+
+.pillar:nth-child(4) {
+    background: #303c36;
+}
+
+.pillar-number {
+
+    position: absolute;
+
+    top: 25px;
+    right: 27px;
+
+    z-index: 3;
+
+    font-size: 9px;
+
+    letter-spacing: .18em;
+}
+
+.pillar-content {
+
+    position: relative;
+
+    z-index: 3;
+
+    padding: 45px;
+}
+
+.pillar-label {
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .2em;
+}
+
+.pillar h3 {
+
+    font-family: var(--serif);
+
+    font-size: clamp(3rem,5vw,5.2rem);
+
+    font-weight: 400;
+
+    line-height: .9;
+
+    letter-spacing: -.04em;
+
+    margin: 15px 0 20px;
+}
+
+.pillar p {
+
+    max-width: 470px;
+
+    color: rgba(255,255,255,.72);
+
+    font-size: 13px;
+
+    line-height: 1.7;
+
+    margin-bottom: 25px;
+}
+
+.pillar a {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .13em;
+
+    text-transform: uppercase;
+
+    border-bottom: 1px solid rgba(255,255,255,.6);
+
+    padding-bottom: 6px;
+}
+
+
+/* =========================================================
+   DARK FEATURE
+========================================================= */
+
+.dark-feature {
+
+    position: relative;
+
+    min-height: 850px;
+
+    color: white;
+
+    overflow: hidden;
+
+    display: flex;
+
+    align-items: center;
+}
+
+.dark-image {
+
+    position: absolute;
+
+    inset: -3%;
+
+    z-index: -2;
+}
+
+.dark-image img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    filter: saturate(.55);
+}
+
+.dark-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: -1;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(18,27,23,.93),
+            rgba(18,27,23,.58) 55%,
+            rgba(18,27,23,.2)
+        );
+}
+
+.dark-inner {
+
+    min-height: 850px;
+
+    padding-top: 110px;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+.dark-inner .display {
+
+    margin-top: auto;
+
+    margin-bottom: 50px;
+
+    max-width: 1000px;
+}
+
+.dark-bottom {
+
+    padding-bottom: 90px;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 100px;
+
+    align-items: end;
+}
+
+.dark-bottom p {
+
+    max-width: 460px;
+
+    color: rgba(255,255,255,.67);
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+.light-link {
+
+    justify-self: end;
+
+    display: inline-flex;
+
+    gap: 10px;
+
+    align-items: center;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .14em;
+
+    text-transform: uppercase;
+
+    border-bottom: 1px solid rgba(255,255,255,.5);
+
+    padding-bottom: 6px;
+}
+
+
+/* =========================================================
+   HEALTH LIST
+========================================================= */
+
+.health {
+
+    background: var(--ivory);
+}
+
+.split-heading {
+
+    display: grid;
+
+    grid-template-columns: 1.2fr .8fr;
+
+    gap: 80px;
+
+    align-items: end;
+
+    margin-bottom: 70px;
+}
+
+.split-heading p {
+
+    max-width: 420px;
+
+    color: #60615a;
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+.health-list {
+
+    border-top: 1px solid rgba(25,27,25,.25);
+}
+
+.health-item {
+
+    display: grid;
+
+    grid-template-columns: 70px 1.1fr 1fr 40px;
+
+    align-items: center;
+
+    gap: 20px;
+
+    min-height: 120px;
+
+    border-bottom: 1px solid rgba(25,27,25,.2);
+
+    transition:
+        padding .4s var(--ease),
+        background .4s ease;
+}
+
+.health-item:hover {
+
+    padding-inline: 20px;
+
+    background: rgba(38,53,47,.04);
+}
+
+.health-number {
+
+    color: var(--burgundy);
+
+    font-size: 9px;
+
+    letter-spacing: .15em;
+}
+
+.health-name {
+
+    font-family: var(--serif);
+
+    font-size: clamp(2.1rem,4vw,4rem);
+
+    letter-spacing: -.035em;
+}
+
+.health-description {
+
+    color: #77776f;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: .11em;
+
+    text-transform: uppercase;
+}
+
+.health-item svg {
+
+    width: 18px;
+
+    justify-self: end;
+}
+
+
+/* =========================================================
+   LIFE STAGES
+========================================================= */
+
+.life {
+
+    background: var(--forest);
+
+    color: white;
+
+    overflow: hidden;
+}
+
+.life .meta {
+    color: rgba(255,255,255,.5);
+}
+
+.life .meta .number {
+    color: #d1b4a4;
+}
+
+.life-intro {
+
+    display: grid;
+
+    grid-template-columns: 1fr .7fr;
+
+    gap: 100px;
+
+    margin-top: 65px;
+
+    margin-bottom: 80px;
+}
+
+.life-intro h2 {
+
+    font-family: var(--serif);
+
+    font-weight: 400;
+
+    font-size: clamp(4rem,7vw,7rem);
+
+    line-height: .9;
+
+    letter-spacing: -.05em;
+}
+
+.life-intro p {
+
+    align-self: end;
+
+    max-width: 400px;
+
+    color: rgba(255,255,255,.58);
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+.life-track {
+
+    display: flex;
+
+    gap: 20px;
+
+    padding: 0 40px 40px;
+
+    width: max-content;
+}
+
+.life-card {
+
+    width: 350px;
+
+    min-height: 410px;
+
+    padding: 38px;
+
+    border: 1px solid rgba(255,255,255,.17);
+
+    display: flex;
+
+    flex-direction: column;
+
+    transition:
+        transform .5s var(--ease),
+        background .4s ease;
+}
+
+.life-card:hover {
+
+    transform: translateY(-10px);
+
+    background: rgba(255,255,255,.05);
+}
+
+.life-card .age {
+
+    color: #c8bdb2;
+
+    font-size: 10px;
+
+    letter-spacing: .17em;
+}
+
+.life-card h3 {
+
+    margin-top: auto;
+
+    margin-bottom: 18px;
+
+    font-family: var(--serif);
+
+    font-size: 3rem;
+
+    font-weight: 400;
+
+    line-height: .95;
+
+    letter-spacing: -.03em;
+}
+
+.life-card p {
+
+    color: rgba(255,255,255,.55);
+
+    font-size: 12px;
+
+    line-height: 1.7;
+
+    margin-bottom: 25px;
+}
+
+.life-card a {
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .15em;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   STORIES
+========================================================= */
+
+.stories {
+
+    background: var(--paper);
+}
+
+.story-grid {
+
+    display: grid;
+
+    grid-template-columns: 1.2fr .8fr;
+
+    gap: 25px;
+}
+
+.story-main {
+
+    background: var(--forest);
+
+    color: white;
+}
+
+.story-main-image {
+
+    height: 540px;
+
+    overflow: hidden;
+}
+
+.story-main-image img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transition: transform 1s var(--ease);
+}
+
+.story-main:hover img {
+
+    transform: scale(1.04);
+}
+
+.story-main-content {
+
+    padding: 35px;
+}
+
+.story-category {
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .17em;
+}
+
+.story-main h3 {
+
+    max-width: 650px;
+
+    font-family: var(--serif);
+
+    font-size: clamp(3rem,5vw,5rem);
+
+    font-weight: 400;
+
+    line-height: .9;
+
+    margin: 15px 0;
+}
+
+.story-main p {
+
+    max-width: 480px;
+
+    color: rgba(255,255,255,.65);
+
+    font-size: 13px;
+
+    line-height: 1.7;
+
+    margin-bottom: 20px;
+}
+
+.story-main a,
+.story-small a {
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .14em;
+
+    text-transform: uppercase;
+}
+
+.story-column {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 25px;
+}
+
+.story-small {
+
+    min-height: 320px;
+
+    padding: 28px;
+
+    background: var(--ivory);
+
+    display: grid;
+
+    grid-template-columns: 150px 1fr;
+
+    gap: 25px;
+
+    align-items: center;
+}
+
+.story-small-image {
+
+    height: 260px;
+
+    overflow: hidden;
+}
+
+.story-small-image img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    filter: saturate(.7);
+
+    transition: transform .8s var(--ease);
+}
+
+.story-small:hover img {
+    transform: scale(1.05);
+}
+
+.story-small span {
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: .15em;
+
+    color: var(--burgundy);
+}
+
+.story-small h3 {
+
+    font-family: var(--serif);
+
+    font-size: 2.4rem;
+
+    line-height: .95;
+
+    font-weight: 400;
+
+    margin: 12px 0 25px;
+}
+
+
+/* =========================================================
+   MEN'S DAY
+========================================================= */
+
+.mens-day {
+
+    position: relative;
+
+    min-height: 850px;
+
+    color: white;
+
+    overflow: hidden;
+
+    display: flex;
+
+    align-items: center;
+}
+
+.mens-image {
+
+    position: absolute;
+
+    inset: -3%;
+
+    z-index: -2;
+}
+
+.mens-image img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    filter: saturate(.5);
+}
+
+.mens-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: -1;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(20,24,21,.9),
+            rgba(20,24,21,.48),
+            rgba(20,24,21,.15)
+        );
+}
+
+.mens-content {
+
+    padding-top: 80px;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+.mens-date {
+
+    margin-top: auto;
+
+    font-size: clamp(5rem,13vw,13rem);
+
+    font-weight: 800;
+
+    line-height: .75;
+
+    letter-spacing: -.08em;
+
+    color: rgba(255,255,255,.08);
+
+    position: absolute;
+
+    bottom: 55px;
+
+    right: 40px;
+
+    pointer-events: none;
+}
+
+.mens-content h2 {
+
+    max-width: 800px;
+
+    margin-top: 80px;
+
+    font-family: var(--serif);
+
+    font-weight: 400;
+
+    font-size: clamp(5rem,9vw,10rem);
+
+    line-height: .82;
+
+    letter-spacing: -.06em;
+}
+
+.mens-content h2 em {
+
+    color: #d1b4a4;
+}
+
+.mens-content p {
+
+    max-width: 500px;
+
+    color: rgba(255,255,255,.68);
+
+    font-size: 14px;
+
+    line-height: 1.8;
+
+    margin: 30px 0;
+}
+
+.outline-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    width: max-content;
+
+    padding: 15px 20px;
+
+    border: 1px solid rgba(255,255,255,.45);
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .14em;
+
+    text-transform: uppercase;
+
+    transition: all .3s ease;
+}
+
+.outline-button:hover {
+
+    background: white;
+
+    color: var(--charcoal);
+
+}
+
+
+/* =========================================================
+   RESOURCES
+========================================================= */
+
+.resources {
+
+    background: var(--ivory);
+}
+
+.resource-header {
+
+    display: grid;
+
+    grid-template-columns: 1fr .6fr;
+
+    gap: 100px;
+
+    margin-top: 65px;
+
+    margin-bottom: 70px;
+}
+
+.resource-header h2 {
+
+    font-family: var(--serif);
+
+    font-size: clamp(4rem,7vw,7rem);
+
+    font-weight: 400;
+
+    line-height: .9;
+
+    letter-spacing: -.05em;
+}
+
+.resource-header p {
+
+    align-self: end;
+
+    max-width: 400px;
+
+    color: #62635c;
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+.resource-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(3,1fr);
+
+    gap: 20px;
+}
+
+.resource-card {
+
+    min-height: 370px;
+
+    padding: 35px;
+
+    border: 1px solid rgba(25,27,25,.18);
+
+    display: flex;
+
+    flex-direction: column;
+
+    transition:
+        transform .45s var(--ease),
+        background .4s ease;
+}
+
+.resource-card:hover {
+
+    transform: translateY(-8px);
+
+    background: var(--paper);
+}
+
+.resource-card > span {
+
+    font-size: 9px;
+
+    color: var(--burgundy);
+
+    letter-spacing: .15em;
+}
+
+.resource-card svg {
+
+    width: 35px;
+
+    height: 35px;
+
+    margin-top: 60px;
+}
+
+.resource-card h3 {
+
+    font-family: var(--serif);
+
+    font-size: 2.7rem;
+
+    font-weight: 400;
+
+    line-height: .95;
+
+    margin: 20px 0 12px;
+}
+
+.resource-card p {
+
+    color: #66675f;
+
+    font-size: 12px;
+
+    line-height: 1.7;
+}
+
+.resource-card strong {
+
+    margin-top: auto;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .15em;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   FINAL CTA
+========================================================= */
+
+.final {
+
+    background: var(--forest-dark);
+
+    color: white;
+
+    padding: 170px 0;
+
+    text-align: center;
+}
+
+.final-inner {
+
+    max-width: 1050px;
+
+    margin: auto;
+}
+
+.final .meta {
+
+    justify-content: center;
+
+    color: rgba(255,255,255,.45);
+}
+
+.final .meta .number {
+    color: #d1b4a4;
+}
+
+.final h2 {
+
+    margin-top: 50px;
+
+    font-family: var(--serif);
+
+    font-weight: 400;
+
+    font-size: clamp(4.5rem,9vw,10rem);
+
+    line-height: .82;
+
+    letter-spacing: -.06em;
+}
+
+.final h2 em {
+
+    color: #d1b4a4;
+
+    font-style: italic;
+}
+
+.final p {
+
+    max-width: 470px;
+
+    margin: 35px auto;
+
+    color: rgba(255,255,255,.6);
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+
+    background: var(--forest-dark);
+
+    color: white;
+
+    border-top: 1px solid rgba(255,255,255,.12);
+
+    padding: 70px 0 30px;
+}
+
+.footer-top {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 100px;
+
+    padding-bottom: 70px;
+}
+
+.footer-brand p {
+
+    margin-top: 25px;
+
+    color: rgba(255,255,255,.4);
+
+    font-size: 12px;
+
+    line-height: 1.8;
+}
+
+.footer-links {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+}
+
+.footer-links div {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+.footer-links span {
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: .18em;
+
+    color: rgba(255,255,255,.35);
+
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+
+    font-size: 11px;
+
+    color: rgba(255,255,255,.7);
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+.footer-bottom {
+
+    padding-top: 25px;
+
+    border-top: 1px solid rgba(255,255,255,.1);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    color: rgba(255,255,255,.3);
+
+    font-size: 7px;
+
+    letter-spacing: .13em;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   REVEAL ANIMATION
+========================================================= */
+
+.reveal {
+
+    opacity: 0;
+
+    transform: translateY(35px);
+
+    transition:
+        opacity .9s var(--ease),
+        transform .9s var(--ease);
+}
+
+.reveal.visible {
+
+    opacity: 1;
+
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .desktop-nav {
+        display: none;
+    }
+
+    .menu-btn {
+        display: block;
+    }
+
+    .container {
+        width: min(100% - 50px, 1380px);
+    }
+
+    header {
+        padding: 0 25px;
+    }
+
+    .hero-content {
+        width: calc(100% - 50px);
+    }
+
+    .manifesto-grid,
+    .split-heading,
+    .life-intro,
+    .resource-header {
+
+        grid-template-columns: 1fr;
+
+        gap: 45px;
+    }
+
+    .pillar-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pillar {
+        min-height: 620px;
+    }
+
+    .story-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .resource-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .footer-top {
+        grid-template-columns: 1fr;
+
+        gap: 60px;
+    }
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .section {
+        padding: 100px 0;
+    }
+
+    .container {
+        width: calc(100% - 36px);
+    }
+
+    header {
+        height: 70px;
+        padding: 0 18px;
+    }
+
+    header.scrolled {
+        height: 62px;
+    }
+
+    .hero {
+        min-height: 700px;
+    }
+
+    .hero-content {
+        width: calc(100% - 36px);
+        padding-top: 60px;
+    }
+
+    .hero h1 {
+        font-size: clamp(4rem, 18vw, 7rem);
+    }
+
+    .hero-copy {
+        font-size: 13px;
+    }
+
+    .hero-bottom {
+        left: 18px;
+        right: 18px;
+        bottom: 22px;
+    }
+
+    .scroll-line {
+        width: 60px;
+    }
+
+    .manifesto-grid {
+        margin-top: 50px;
+    }
+
+    .display {
+        font-size: clamp(3.5rem, 16vw, 6rem);
+    }
+
+    .section-heading h2 {
+        font-size: clamp(3.5rem, 15vw, 6rem);
+    }
+
+    .pillar {
+        min-height: 570px;
+    }
+
+    .pillar-content {
+        padding: 30px;
+    }
+
+    .pillar h3 {
+        font-size: clamp(3rem, 14vw, 5rem);
+    }
+
+    .dark-feature,
+    .dark-inner,
+    .mens-day {
+        min-height: 750px;
+    }
+
+    .dark-inner {
+        padding-top: 80px;
+    }
+
+    .dark-bottom {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding-bottom: 55px;
+    }
+
+    .light-link {
+        justify-self: start;
+    }
+
+    .health-item {
+        grid-template-columns: 35px 1fr 30px;
+        min-height: 100px;
+    }
+
+    .health-description {
+        display: none;
+    }
+
+    .health-name {
+        font-size: 2.4rem;
+    }
+
+    .life-intro {
+        margin-bottom: 50px;
+    }
+
+    .life-intro h2 {
+        font-size: clamp(3.7rem, 16vw, 6rem);
+    }
+
+    .life-track {
+        padding-left: 18px;
+    }
+
+    .life-card {
+        width: 300px;
+        min-height: 380px;
+    }
+
+    .story-main-image {
+        height: 420px;
+    }
+
+    .story-main h3 {
+        font-size: 3.2rem;
+    }
+
+    .story-small {
+        grid-template-columns: 110px 1fr;
+        padding: 20px;
+    }
+
+    .story-small-image {
+        height: 220px;
+    }
+
+    .story-small h3 {
+        font-size: 2rem;
+    }
+
+    .mens-content h2 {
+        font-size: clamp(4rem, 17vw, 7rem);
+    }
+
+    .mens-date {
+        font-size: 25vw;
+        right: 15px;
+    }
+
+    .resource-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .resource-card {
+        min-height: 330px;
+    }
+
+    .final {
+        padding: 120px 0;
+    }
+
+    .final h2 {
+        font-size: clamp(4rem, 17vw, 7rem);
+    }
+
+    .footer-links {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+    .hero h1 {
+        font-size: 3.9rem;
+    }
+
+    .hero-copy {
+        max-width: 330px;
+    }
+
+    .pillar {
+        min-height: 530px;
+    }
+
+    .pillar-content {
+        padding: 25px;
+    }
+
+    .pillar h3 {
+        font-size: 3rem;
+    }
+
+    .story-small {
+        grid-template-columns: 1fr;
+    }
+
+    .story-small-image {
+        height: 250px;
+    }
+
+    .footer-links {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header id="header">
+
+    <a href="#" class="logo">
+
+        <span class="logo-mark">M</span>
+
+        <span>
+            MEN <em>/</em> WELL
+        </span>
+
+    </a>
+
+
+    <nav>
+
+        <a href="#health">Health</a>
+
+        <a href="#mind">Mind</a>
+
+        <a href="#stories">Stories</a>
+
+        <a href="#mens-day">Men's Day</a>
+
+        <a href="#resources">Resources</a>
+
+    </nav>
+
+
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+        <i data-lucide="menu"></i>
+    </button>
+
+</header>
+
+
+<!-- =========================================================
+     MOBILE MENU
+========================================================= -->
+
+<div class="mobile-menu" id="mobileMenu">
+
+    <button class="mobile-close" id="mobileClose">
+        <i data-lucide="x"></i>
+    </button>
+
+
+    <div class="mobile-menu-inner">
+
+        <span class="mobile-label">
+            EXPLORE
+        </span>
+
+        <a href="#health">Health</a>
+
+        <a href="#mind">Mind</a>
+
+        <a href="#stories">Stories</a>
+
+        <a href="#mens-day">Men's Day</a>
+
+        <a href="#resources">Resources</a>
+
+
+        <div class="mobile-footer">
+
+            <span>MEN / WELL</span>
+
+            <span>FOR MEN. FOR LIFE.</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<main>
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<section class="hero">
+
+    <div class="hero-image">
+
+        <img
+        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=2200&q=85"
+        alt="Portrait of a man">
+
+    </div>
+
+
+    <div class="hero-overlay"></div>
+
+
+    <div class="hero-content">
+
+        <div class="hero-kicker">
+            MEN'S HEALTH & WELLBEING
+        </div>
+
+
+        <h1>
+            Men's health<br>
+            is more than<br>
+            <em>the body.</em>
+        </h1>
+
+
+        <p class="hero-copy">
+
+            A thoughtful space for physical health,
+            mental wellbeing, relationships, purpose
+            and the conversations men don't always have.
+
+        </p>
+
+
+        <a href="#health" class="button">
+
+            Explore men's wellbeing
+
+            <i data-lucide="arrow-down-right"></i>
+
+        </a>
+
+    </div>
+
+
+    <div class="hero-bottom">
+
+        <span>SCROLL TO EXPLORE</span>
+
+        <div class="scroll-line">
+            <span></span>
+        </div>
+
+        <span class="page">01 / 08</span>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     MANIFESTO
+========================================================= -->
+
+<section class="section manifesto">
+
+    <div class="container">
+
+        <div class="meta">
+            <span class="number">01</span>
+            <span>THE CONVERSATION</span>
+        </div>
+
+
+        <div class="manifesto-grid">
+
+            <h2 class="display reveal">
+
+                We talk about strength.
+                <em>Let's talk about what it costs.</em>
+
+            </h2>
+
+
+            <div class="manifesto-copy reveal">
+
+                <p>
+                    Men are often taught to push through,
+                    keep going and handle things alone.
+                </p>
+
+                <p>
+                    But health isn't only about how strong
+                    you look. It's about how you feel,
+                    how you connect, how you recover and
+                    whether you know when to ask for help.
+                </p>
+
+
+                <a href="#mind" class="text-link">
+
+                    Start the conversation
+
+                    <i data-lucide="arrow-up-right"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     FOUR PILLARS
+========================================================= -->
+
+<section class="section pillars">
+
+    <div class="container">
+
+        <div class="section-heading reveal">
+
+            <div class="meta">
+
+                <span class="number">02</span>
+
+                <span>FOUR DIMENSIONS</span>
+
+            </div>
+
+
+            <h2>
+
+                A healthier life<br>
+                is <em>whole.</em>
+
+            </h2>
+
+        </div>
+
+
+        <div class="pillar-grid">
+
+
+            <!-- BODY -->
+
+            <article class="pillar reveal">
+
+                <div class="pillar-image">
+
+                    <img
+                    src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1500&q=85"
+                    alt="Man exercising">
+
+                </div>
+
+
+                <span class="pillar-number">
+                    01
+                </span>
+
+
+                <div class="pillar-content">
+
+                    <span class="pillar-label">
+                        BODY
+                    </span>
+
+                    <h3>
+                        Know your health.
+                    </h3>
+
+                    <p>
+                        Heart health, fitness, nutrition,
+                        sleep and prevention — the foundations
+                        that keep you moving.
+                    </p>
+
+                    <a href="#health">
+                        Explore health
+                        <i data-lucide="arrow-up-right"></i>
+                    </a>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- MIND -->
+
+            <article class="pillar reveal">
+
+                <div class="pillar-image">
+
+                    <img
+                    src="https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&w=1500&q=85"
+                    alt="Man sitting thoughtfully">
+
+                </div>
+
+
+                <span class="pillar-number">
+                    02
+                </span>
+
+
+                <div class="pillar-content">
+
+                    <span class="pillar-label">
+                        MIND
+                    </span>
+
+                    <h3>
+                        Take your mind seriously.
+                    </h3>
+
+                    <p>
+                        Stress, anxiety, burnout, loneliness
+                        and the invisible weight men often carry.
+                    </p>
+
+                    <a href="#mind">
+                        Explore mental wellbeing
+                        <i data-lucide="arrow-up-right"></i>
+                    </a>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- CONNECTION -->
+
+            <article class="pillar reveal">
+
+                <div class="pillar-image">
+
+                    <img
+                    src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1500&q=85"
+                    alt="Friends together">
+
+                </div>
+
+
+                <span class="pillar-number">
+                    03
+                </span>
+
+
+                <div class="pillar-content">
+
+                    <span class="pillar-label">
+                        CONNECTION
+                    </span>
+
+                    <h3>
+                        Men need people too.
+                    </h3>
+
+                    <p>
+                        Friendship, family, relationships,
+                        fatherhood and the communities that
+                        keep us grounded.
+                    </p>
+
+                    <a href="#stories">
+                        Explore connection
+                        <i data-lucide="arrow-up-right"></i>
+                    </a>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- PURPOSE -->
+
+            <article class="pillar reveal">
+
+                <div class="pillar-image">
+
+                    <img
+                    src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1500&q=85"
+                    alt="Man outdoors">
+
+                </div>
+
+
+                <span class="pillar-number">
+                    04
+                </span>
+
+
+                <div class="pillar-content">
+
+                    <span class="pillar-label">
+                        PURPOSE
+                    </span>
+
+                    <h3>
+                        Build a life that means something.
+                    </h3>
+
+                    <p>
+                        Work, identity, confidence, ageing
+                        and discovering what you want the
+                        next chapter to look like.
+                    </p>
+
+                    <a href="#stories">
+                        Explore purpose
+                        <i data-lucide="arrow-up-right"></i>
+                    </a>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     MENTAL WELLBEING
+========================================================= -->
+
+<section class="dark-feature" id="mind">
+
+    <div class="dark-image">
+
+        <img
+        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=2200&q=85"
+        alt="Portrait of a man">
+
+    </div>
+
+
+    <div class="dark-overlay"></div>
+
+
+    <div class="container dark-inner">
+
+        <div class="meta" style="color:rgba(255,255,255,.5)">
+
+            <span class="number"
+            style="color:#d1b4a4">
+                03
+            </span>
+
+            <span>
+                MENTAL WELLBEING
+            </span>
+
+        </div>
+
+
+        <h2 class="display reveal">
+
+            You don't have to<br>
+            carry everything <em>alone.</em>
+
+        </h2>
+
+
+        <div class="dark-bottom reveal">
+
+            <p>
+                Mental health is health.
+                Understanding what you're feeling is
+                not weakness — it's part of taking care
+                of yourself.
+            </p>
+
+
+            <a href="#" class="light-link">
+
+                Explore mental wellbeing
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     HEALTH
+========================================================= -->
+
+<section class="section health" id="health">
+
+    <div class="container">
+
+        <div class="split-heading reveal">
+
+            <div>
+
+                <div class="meta">
+
+                    <span class="number">04</span>
+
+                    <span>MEN'S HEALTH</span>
+
+                </div>
+
+
+                <h2 class="display">
+
+                    Know your body.<br>
+                    <em>Look after it.</em>
+
+                </h2>
+
+            </div>
+
+
+            <p>
+
+                Better health starts with understanding
+                what's happening inside you — and knowing
+                when it's time to pay attention.
+
+            </p>
+
+        </div>
+
+
+        <div class="health-list">
+
+
+            <a href="#" class="health-item reveal">
+
+                <span class="health-number">
+                    01
+                </span>
+
+                <span class="health-name">
+                    Heart health
+                </span>
+
+                <span class="health-description">
+                    Understanding cardiovascular health
+                </span>
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+
+            <a href="#" class="health-item reveal">
+
+                <span class="health-number">
+                    02
+                </span>
+
+                <span class="health-name">
+                    Sleep
+                </span>
+
+                <span class="health-description">
+                    The health factor we underestimate
+                </span>
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+
+            <a href="#" class="health-item reveal">
+
+                <span class="health-number">
+                    03
+                </span>
+
+                <span class="health-name">
+                    Hormones
+                </span>
+
+                <span class="health-description">
+                    What changes as we age
+                </span>
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+
+            <a href="#" class="health-item reveal">
+
+                <span class="health-number">
+                    04
+                </span>
+
+                <span class="health-name">
+                    Sexual health
+                </span>
+
+                <span class="health-description">
+                    Honest conversations without shame
+                </span>
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+
+            <a href="#" class="health-item reveal">
+
+                <span class="health-number">
+                    05
+                </span>
+
+                <span class="health-name">
+                    Fitness
+                </span>
+
+                <span class="health-description">
+                    Strength, mobility and longevity
+                </span>
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+
+            <a href="#" class="health-item reveal">
+
+                <span class="health-number">
+                    06
+                </span>
+
+                <span class="health-name">
+                    Prevention
+                </span>
+
+                <span class="health-description">
+                    Don't wait for symptoms
+                </span>
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     LIFE STAGES
+========================================================= -->
+
+<section class="section life">
+
+    <div class="container">
+
+        <div class="meta">
+
+            <span class="number">05</span>
+
+            <span>LIFE STAGES</span>
+
+        </div>
+
+
+        <div class="life-intro reveal">
+
+            <h2>
+
+                Health changes.<br>
+                <em>So do we.</em>
+
+            </h2>
+
+
+            <p>
+
+                The questions you ask at 22 aren't the
+                same ones you'll ask at 52. Your health
+                journey changes with you.
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="life-track">
+
+
+        <article class="life-card reveal">
+
+            <span class="age">
+                18—24
+            </span>
+
+            <h3>
+                Find your foundations.
+            </h3>
+
+            <p>
+                Understanding your body, habits,
+                confidence and mental wellbeing.
+            </p>
+
+            <a href="#">
+                Explore →
+            </a>
+
+        </article>
+
+
+        <article class="life-card reveal">
+
+            <span class="age">
+                25—34
+            </span>
+
+            <h3>
+                Build healthy habits.
+            </h3>
+
+            <p>
+                Work, relationships, fitness, stress
+                and long-term health.
+            </p>
+
+            <a href="#">
+                Explore →
+            </a>
+
+        </article>
+
+
+        <article class="life-card reveal">
+
+            <span class="age">
+                35—44
+            </span>
+
+            <h3>
+                The years that matter.
+            </h3>
+
+            <p>
+                Prevention, family, career pressure
+                and understanding the changing body.
+            </p>
+
+            <a href="#">
+                Explore →
+            </a>
+
+        </article>
+
+
+        <article class="life-card reveal">
+
+            <span class="age">
+                45—54
+            </span>
+
+            <h3>
+                Pay attention to change.
+            </h3>
+
+            <p>
+                Hormones, cardiovascular health,
+                ageing and redefining what's next.
+            </p>
+
+            <a href="#">
+                Explore →
+            </a>
+
+        </article>
+
+
+        <article class="life-card reveal">
+
+            <span class="age">
+                55+
+            </span>
+
+            <h3>
+                Healthy ageing.
+            </h3>
+
+            <p>
+                Staying active, connected and independent
+                through the next chapter.
+            </p>
+
+            <a href="#">
+                Explore →
+            </a>
+
+        </article>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     STORIES
+========================================================= -->
+
+<section class="section stories" id="stories">
+
+    <div class="container">
+
+        <div class="split-heading reveal">
+
+            <div>
+
+                <div class="meta">
+
+                    <span class="number">06</span>
+
+                    <span>REAL STORIES</span>
+
+                </div>
+
+
+                <h2 class="display">
+
+                    Real men.<br>
+                    <em>Real stories.</em>
+
+                </h2>
+
+            </div>
+
+
+            <p>
+
+                The experiences behind the statistics.
+                Honest conversations about the things
+                men don't always say out loud.
+
+            </p>
+
+        </div>
+
+
+        <div class="story-grid">
+
+
+            <article class="story-main reveal">
+
+                <div class="story-main-image">
+
+                    <img
+                    src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1600&q=85"
+                    alt="Man portrait">
+
+                </div>
+
+
+                <div class="story-main-content">
+
+                    <span class="story-category">
+                        MENTAL HEALTH
+                    </span>
+
+
+                    <h3>
+                        When "I'm fine"
+                        isn't fine.
+                    </h3>
+
+
+                    <p>
+                        On learning that asking for help
+                        can be an act of strength.
+                    </p>
+
+
+                    <a href="#">
+                        Read story →
+                    </a>
+
+                </div>
+
+            </article>
+
+
+
+            <div class="story-column">
+
+
+                <article class="story-small reveal">
+
+                    <div class="story-small-image">
+
+                        <img
+                        src="https://images.unsplash.com/photo-1504150558240-0b4fd8946624?auto=format&fit=crop&w=1000&q=85"
+                        alt="Man walking">
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            FRIENDSHIP
+                        </span>
+
+
+                        <h3>
+                            Why grown men
+                            need friends.
+                        </h3>
+
+
+                        <a href="#">
+                            Read story →
+                        </a>
+
+                    </div>
+
+                </article>
+
+
+
+                <article class="story-small reveal">
+
+                    <div class="story-small-image">
+
+                        <img
+                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1000&q=85"
+                        alt="Portrait">
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            IDENTITY
+                        </span>
+
+
+                        <h3>
+                            Becoming comfortable
+                            with who you are.
+                        </h3>
+
+
+                        <a href="#">
+                            Read story →
+                        </a>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     MEN'S DAY
+========================================================= -->
+
+<section class="mens-day" id="mens-day">
+
+    <div class="mens-image">
+
+        <img
+        src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=2200&q=85"
+        alt="Man standing">
+
+    </div>
+
+
+    <div class="mens-overlay"></div>
+
+
+    <div class="container mens-content">
+
+        <div class="meta"
+        style="color:rgba(255,255,255,.5)">
+
+            <span class="number"
+            style="color:#d1b4a4">
+                07
+            </span>
+
+            <span>
+                INTERNATIONAL MEN'S DAY
+            </span>
+
+        </div>
+
+
+        <div class="mens-date">
+            NOV 19
+        </div>
+
+
+        <h2 class="reveal">
+
+            A day to talk<br>
+            about <em>men.</em>
+
+        </h2>
+
+
+        <p class="reveal">
+
+            Health. Wellbeing. Relationships.
+            Responsibility. Positive role models.
+            The conversations worth having.
+
+        </p>
+
+
+        <a href="#" class="outline-button reveal">
+
+            Explore Men's Day
+
+            <i data-lucide="arrow-up-right"></i>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     RESOURCES
+========================================================= -->
+
+<section class="section resources" id="resources">
+
+    <div class="container">
+
+        <div class="meta reveal">
+
+            <span class="number">08</span>
+
+            <span>RESOURCES</span>
+
+        </div>
+
+
+        <div class="resource-header reveal">
+
+            <h2>
+
+                Useful things.<br>
+                <em>When you need them.</em>
+
+            </h2>
+
+
+            <p>
+
+                Practical guides, health information
+                and conversations designed to help
+                you take the next step.
+
+            </p>
+
+        </div>
+
+
+        <div class="resource-grid">
+
+
+            <a href="#" class="resource-card reveal">
+
+                <span>01</span>
+
+                <i data-lucide="heart-pulse"></i>
+
+                <h3>
+                    Health guides
+                </h3>
+
+                <p>
+                    Understand the basics of men's
+                    physical health.
+                </p>
+
+                <strong>
+                    Explore →
+                </strong>
+
+            </a>
+
+
+
+            <a href="#" class="resource-card reveal">
+
+                <span>02</span>
+
+                <i data-lucide="brain"></i>
+
+                <h3>
+                    Mental wellbeing
+                </h3>
+
+                <p>
+                    Tools and information for your
+                    mental health.
+                </p>
+
+                <strong>
+                    Explore →
+                </strong>
+
+            </a>
+
+
+
+            <a href="#" class="resource-card reveal">
+
+                <span>03</span>
+
+                <i data-lucide="message-circle"></i>
+
+                <h3>
+                    Start a conversation
+                </h3>
+
+                <p>
+                    Questions that can help you talk
+                    about what matters.
+                </p>
+
+                <strong>
+                    Explore →
+                </strong>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     FINAL CTA
+========================================================= -->
+
+<section class="final">
+
+    <div class="container">
+
+        <div class="final-inner">
+
+            <div class="meta">
+
+                <span>
+                    THE NEXT CHAPTER
+                </span>
+
+            </div>
+
+
+            <h2 class="reveal">
+
+                Take care of<br>
+                the man you're <em>becoming.</em>
+
+            </h2>
+
+
+            <p class="reveal">
+
+                Your health is not something to
+                think about later. Start where you are.
+
+            </p>
+
+
+            <a href="#health" class="button reveal">
+
+                Begin exploring
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer>
+
+    <div class="container">
+
+        <div class="footer-top">
+
+
+            <div class="footer-brand">
+
+                <div class="logo">
+
+                    <span class="logo-mark">
+                        M
+                    </span>
+
+                    <span>
+                        MEN <em>/</em> WELL
+                    </span>
+
+                </div>
+
+
+                <p>
+
+                    For men. For health.<br>
+                    For the life ahead.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="footer-links">
+
+
+                <div>
+
+                    <span>
+                        EXPLORE
+                    </span>
+
+                    <a href="#health">
+                        Health
+                    </a>
+
+                    <a href="#mind">
+                        Mind
+                    </a>
+
+                    <a href="#stories">
+                        Stories
+                    </a>
+
+                    <a href="#mens-day">
+                        Men's Day
+                    </a>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        ABOUT
+                    </span>
+
+                    <a href="#">
+                        Our mission
+                    </a>
+
+                    <a href="#">
+                        Contact
+                    </a>
+
+                    <a href="#">
+                        Privacy
+                    </a>
+
+                    <a href="#">
+                        Accessibility
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <span>
+                © 2026 MEN / WELL
+            </span>
+
+            <span>
+                Health information should complement,
+                not replace professional medical advice.
+            </span>
+
+            <span>
+                MADE FOR MEN, EVERYWHERE.
+            </span>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+/* =========================================================
+   INITIALIZE ICONS
+========================================================= */
+
+lucide.createIcons();
+
+
+/* =========================================================
+   HEADER SCROLL EFFECT
+========================================================= */
+
+const header = document.getElementById("header");
+
+window.addEventListener("scroll", () => {
+
+    if (window.scrollY > 60) {
+
+        header.classList.add("scrolled");
+
+    } else {
+
+        header.classList.remove("scrolled");
+
+    }
+
+}, { passive: true });
+
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+const menuBtn =
+    document.getElementById("menuBtn");
+
+const mobileMenu =
+    document.getElementById("mobileMenu");
+
+const mobileClose =
+    document.getElementById("mobileClose");
+
+
+menuBtn.addEventListener("click", () => {
+
+    mobileMenu.classList.add("active");
+
+    document.body.style.overflow = "hidden";
+
+});
+
+
+mobileClose.addEventListener("click", () => {
+
+    mobileMenu.classList.remove("active");
+
+    document.body.style.overflow = "";
+
+});
+
+
+document
+    .querySelectorAll(".mobile-menu a")
+    .forEach(link => {
+
+        link.addEventListener("click", () => {
+
+            mobileMenu.classList.remove("active");
+
+            document.body.style.overflow = "";
+
+        });
+
+    });
+
+
+
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
+
+const observer =
+    new IntersectionObserver(
+
+        entries => {
+
+            entries.forEach(entry => {
+
+                if (entry.isIntersecting) {
+
+                    entry.target.classList.add("visible");
+
+                    observer.unobserve(entry.target);
+
+                }
+
+            });
+
+        },
+
+        {
+            threshold: .12
+        }
+
+    );
+
+
+document
+    .querySelectorAll(".reveal")
+    .forEach(element => {
+
+        observer.observe(element);
+
+    });
+
+
+
+/* =========================================================
+   HERO PARALLAX
+========================================================= */
+
+const heroImage =
+    document.querySelector(".hero-image img");
+
+
+window.addEventListener("scroll", () => {
+
+    const scroll =
+        window.scrollY;
+
+    if (scroll < window.innerHeight) {
+
+        heroImage.style.transform =
+            `translateY(${scroll * .12}px) scale(1.01)`;
+
+    }
+
+}, { passive: true });
+
+
+
+/* =========================================================
+   LIFE STAGE DRAG / HORIZONTAL SCROLL
+========================================================= */
+
+const track =
+    document.querySelector(".life-track");
+
+let isDown = false;
+let startX;
+let scrollLeft;
+
+
+track.addEventListener("mousedown", e => {
+
+    isDown = true;
+
+    startX = e.pageX -
+        track.offsetLeft;
+
+    scrollLeft =
+        track.scrollLeft;
+
+});
+
+
+track.addEventListener("mouseleave", () => {
+
+    isDown = false;
+
+});
+
+
+track.addEventListener("mouseup", () => {
+
+    isDown = false;
+
+});
+
+
+track.addEventListener("mousemove", e => {
+
+    if (!isDown) return;
+
+    e.preventDefault();
+
+    const x =
+        e.pageX -
+        track.offsetLeft;
+
+    const walk =
+        (x - startX) * 1.2;
+
+    track.scrollLeft =
+        scrollLeft - walk;
+
+});
+
+
+/* =========================================================
+   SMOOTH ANCHOR OFFSET
+========================================================= */
+
+document
+    .querySelectorAll('a[href^="#"]')
+    .forEach(anchor => {
+
+        anchor.addEventListener("click", function(e) {
+
+            const target =
+                document.querySelector(
+                    this.getAttribute("href")
+                );
+
+            if (!target) return;
+
+            e.preventDefault();
+
+            const headerHeight =
+                header.offsetHeight;
+
+            const targetPosition =
+                target.getBoundingClientRect().top
+                +
+                window.scrollY
+                -
+                headerHeight;
+
+            window.scrollTo({
+
+                top: targetPosition,
+
+                behavior: "smooth"
+
+            });
+
+        });
+
+    });
+
+</script>
+
+</body>
+</html>
